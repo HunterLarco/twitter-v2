@@ -7,6 +7,8 @@ async function createClientArgs(args) {
     consumer_key: args['consumer-key'],
     consumer_secret: args['consumer-secret'],
     bearer_token: args['bearer-token'],
+    access_token: args['access-token'],
+    access_token_secret: args['access-token-secret'],
   };
 
   const prompts = [];
@@ -43,7 +45,7 @@ async function main() {
     console.log(`${data.id}: ${data.text.replace(/\s/g, ' ')}`);
   }
 
-  console.log('Stream closed.')
+  console.log('Stream closed.');
 }
 
 if (require.main === module) {

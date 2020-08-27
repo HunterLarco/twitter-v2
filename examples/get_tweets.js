@@ -7,6 +7,8 @@ async function createClientArgs(args) {
     consumer_key: args['consumer-key'],
     consumer_secret: args['consumer-secret'],
     bearer_token: args['bearer-token'],
+    access_token: args['access-token'],
+    access_token_secret: args['access-token-secret'],
   };
 
   const prompts = [];
@@ -32,18 +34,7 @@ async function main() {
   const args = require('minimist')(process.argv.slice(2));
   const client = new Twitter(await createClientArgs(args));
 
-  //  console.log(await client.get('tweets', { ids: '1228393702244134912' }));
-  //  console.log(await client.get('tweets/search/recent', { query: 'Mozilla' }))
-  //  console.log(await client.get('users/by', { usernames: 'twitterdev' }))
-
-  let i = 0;
-  const stream = client.stream('tweets/sample/stream');
-  for await (const data of stream) {
-    console.log(data);
-    if (++i == 15) {
-      stream.close();
-    }
-  }
+  console.log(await client.get('tweets', { ids: '1228393702244134912' }));
 }
 
 if (require.main === module) {

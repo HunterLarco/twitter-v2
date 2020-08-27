@@ -1,6 +1,8 @@
 const AbortController = require('abort-controller');
 const fetch = require('node-fetch');
 const split = require('split');
+const OAuth = require('oauth-1.0a');
+const crypto = require('crypto');
 
 const TwitterError = require('./TwitterError.js');
 const TwitterStream = require('./TwitterStream.js');
@@ -147,6 +149,40 @@ class Twitter {
     return this._bearerPromise;
   }
 
+  async _createAuthorizationHeader(url) {
+    if (usingAppAuth(this.credentials)) {
+      await this._createBearerIfNeeded();
+      return `Bearer ${this.credentials.bearer_token}`;
+    }
+
+    const oauth = OAuth({
+      consumer: {
+        key: this.credentials.consumer_key,
+        secret: this.credentials.consumer_secret,
+      },
+      signature_method: 'HMAC-SHA1',
+      hash_function(base_string, key) {
+        return crypto
+          .createHmac('sha1', key)
+          .update(base_string)
+          .digest('base64');
+      },
+    });
+
+    return oauth.toHeader(
+      oauth.authorize(
+        {
+          url: url.toString(),
+          method: 'get',
+        },
+        {
+          key: this.credentials.access_token,
+          secret: this.credentials.access_token_secret,
+        }
+      )
+    ).Authorization;
+  }
+
   async get(endpoint, parameters) {
     await this._createBearerIfNeeded();
 
@@ -160,7 +196,7 @@ class Twitter {
     return cleanResponse(
       await fetch(url.toString(), {
         headers: {
-          Authorization: `Bearer ${this.credentials.bearer_token}`,
+          Authorization: await this._createAuthorizationHeader(url),
         },
       })
     );

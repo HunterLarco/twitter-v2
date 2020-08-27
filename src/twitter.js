@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const split = require('split');
 
 const TwitterError = require('./TwitterError.js');
+const TwitterStream = require('./TwitterStream.js');
 
 function validateCredentials(credentials) {
   const {
@@ -83,113 +84,21 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
   return body.access_token;
 }
 
-class DeferredPromise {
-  constructor() {
-    this.promise = new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
+async function cleanResponse(response) {
+  const body = await response.json();
+  if (body.status && body.status != 200) {
+    throw new TwitterError(body.title, body.status, body.detail);
   }
-}
-
-class TwitterStream {
-  constructor(client, url) {
-    this.client = client;
-    this.url = url;
-    this._started = false;
-    this._closed = false;
-    this._deferred = null;
-    this._backlog = [];
-    this._abortController = new AbortController();
+  if (body.errors) {
+    const error = body.errors[0];
+    throw new TwitterError(
+      `${body.title}: ${error.message}`,
+      body.type,
+      body.detail
+    );
   }
 
-  async _start() {
-    if (this._closed) {
-      throw new TwitterError('Stream already closed');
-    }
-
-    await this.client._createBearerIfNeeded();
-
-    const response = await fetch(this.url.toString(), {
-      signal: this._abortController.signal,
-      headers: {
-        Authorization: `Bearer ${this.client.credentials.bearer_token}`,
-      },
-    });
-
-    response.body.pipe(split()).on('data', (buffer) => {
-      if (buffer == 'Rate limit exceeded') {
-        this._deferred.reject(new TwitterError('Rate limit exceeded'));
-        this._deferred = null;
-        this.close();
-        return;
-      }
-
-      const data = JSON.parse(buffer);
-
-      let next;
-      if (data.status && data.status != 200) {
-        next = Promise.reject(
-          new TwitterError(data.title, data.status, data.detail)
-        );
-        this.close();
-      } else if (data.errors) {
-        const error = data.errors[0];
-        next = Promise.reject(
-          new TwitterError(
-            `${data.title}: ${error.message}`,
-            data.type,
-            data.detail
-          )
-        );
-        this.close();
-      } else {
-        next = Promise.resolve({ done: false, value: data });
-      }
-
-      if (this._deferred) {
-        this._deferred.resolve(next);
-        this._deferred = null;
-      } else {
-        this._backlog.push(next);
-      }
-    });
-  }
-
-  close() {
-    this._closed = true;
-    this._backlog = [];
-    this._abortController.abort();
-  }
-
-  [Symbol.asyncIterator]() {
-    return {
-      next: async () => {
-        if (!this._started) {
-          this._started = true;
-          this._start().catch((error) => {
-            if (this._deferred) {
-              this._deferred.resolve(next);
-              this._deferred = null;
-            } else {
-              this._backlog.push(next);
-            }
-          });
-        }
-
-        if (this._deferred) {
-          return this._deferred.promise;
-        }
-
-        if (this._backlog.length) {
-          return this._backlog.shift();
-        }
-
-        this._deferred = new DeferredPromise();
-        return this._deferred.promise;
-      },
-    };
-  }
+  return body;
 }
 
 class Twitter {
@@ -248,29 +157,18 @@ class Twitter {
       }
     }
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${this.credentials.bearer_token}`,
-      },
-    });
-
-    const body = await response.json();
-    if (body.status && body.status != 200) {
-      throw new TwitterError(body.title, body.status, body.detail);
-    }
-    if (body.errors) {
-      const error = body.errors[0];
-      throw new TwitterError(
-        `${body.title}: ${error.message}`,
-        body.type,
-        body.detail
-      );
-    }
-
-    return body;
+    return cleanResponse(
+      await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${this.credentials.bearer_token}`,
+        },
+      })
+    );
   }
 
-  stream(endpoint, parameters) {
+  async post(endpoint, body, parameters) {
+    await this._createBearerIfNeeded();
+
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     if (parameters) {
       for (const [key, value] of Object.entries(parameters)) {
@@ -278,7 +176,41 @@ class Twitter {
       }
     }
 
-    return new TwitterStream(this, url);
+    return cleanResponse(
+      await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${this.credentials.bearer_token}`,
+        },
+        body: JSON.stringify(body || {}),
+      })
+    );
+  }
+
+  stream(endpoint, parameters) {
+    const abortController = new AbortController();
+
+    return new TwitterStream(
+      async () => {
+        const url = new URL(`https://api.twitter.com/2/${endpoint}`);
+        if (parameters) {
+          for (const [key, value] of Object.entries(parameters)) {
+            url.searchParams.set(key, value);
+          }
+        }
+
+        await this._createBearerIfNeeded();
+
+        return fetch(url.toString(), {
+          signal: abortController.signal,
+          headers: {
+            Authorization: `Bearer ${this.credentials.bearer_token}`,
+          },
+        });
+      },
+      () => {
+        abortController.abort();
+      }
+    );
   }
 }
 

@@ -43,6 +43,10 @@ class TwitterStream {
 
           const response = await this._connect();
           response.body.pipe(split()).on('data', (line) => {
+            if (!line.trim()) {
+              return
+            }
+
             if (line == 'Rate limit exceeded') {
               this._emit(
                 Promise.reject(new TwitterError('Rate limit exceeded'))

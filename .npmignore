@@ -16,3 +16,7 @@ npm-debug.log*
 
 # Ignore Examples
 examples/
+
+# Ignore prettier
+.prettierignore
+.prettierrc.json

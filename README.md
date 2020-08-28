@@ -14,9 +14,8 @@ const client = new Twitter({
   access_token_secret: ''
 });
 
-client.get('tweets', { ids: '1228393702244134912' }).then(({ data }) => {
-  console.log(data);
-});
+const { data } = await client.get('tweets', { ids: '1228393702244134912' })
+console.log(data)
 ```
 
 ## Installation
@@ -47,11 +46,11 @@ const client = new Twitter({
 });
 ```
 
-Note - You will not have access to all endpoints whilst using Application Only authentication, but you will have access to higher API limits.
+Note - You will not have access to all endpoints while using Application Only authentication, but you will have access to higher API limits.
 
 ## REST API
 
-You now have the ability to make GET and POST requests against the REST API via the convenience methods.
+You can make GET and POST requests against the REST API via the convenience methods.
 
 ```javascript
 client.get(path, urlParams);
@@ -65,22 +64,24 @@ The REST API convenience methods return Promises.
 Use the streaming convenience methods for any stream APIs.
 
 ```javascript
-const stream = client.stream(path, urlParams);
+client.stream(path, urlParams);
 ```
 
 The Streaming API will return an async iterator with the convenience method `close()`.
 
 ```javascript
-const client = new Twitter({
-  consumer_key: '',
-  consumer_secret: '',
-});
-
-const stream = client.stream('tweets/sample/stream')
+const stream = client.stream(path, urlParams);
 
 for await (const { data } of stream) {
-  console.log(data)
+  console.log(data);
 }
 
-stream.close()
+stream.close();
 ```
+
+## V1.1 API Support
+
+This module does not support previous versions of the Twitter API, however it works well with the following V1.1 modules
+
+[![NPM](https://nodei.co/npm/twitter.png?compact=true)](https://nodei.co/npm/twitter/)
+[![NPM](https://nodei.co/npm/twit.png?compact=true)](https://nodei.co/npm/twit/)

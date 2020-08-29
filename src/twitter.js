@@ -6,25 +6,6 @@ const Credentials = require('./Credentials.js');
 const TwitterError = require('./TwitterError.js');
 const TwitterStream = require('./TwitterStream.js');
 
-async function cleanResponse(response) {
-  const body = await response.json();
-
-  if (body.status && body.status != 200) {
-    throw new TwitterError(body.title, body.status, body.detail);
-  }
-
-  if (body.errors) {
-    const error = body.errors[0];
-    throw new TwitterError(
-      `${body.title}: ${error.message}`,
-      body.type,
-      body.detail
-    );
-  }
-
-  return body;
-}
-
 function applyParameters(url, parameters, prefix) {
   prefix = prefix || '';
 
@@ -56,27 +37,37 @@ class Twitter {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
-    return cleanResponse(
-      await fetch(url.toString(), {
-        headers: {
-          Authorization: await this.credentials.authorizationHeader(url),
-        },
-      })
-    );
+    const json = await fetch(url.toString(), {
+      headers: {
+        Authorization: await this.credentials.authorizationHeader(url),
+      },
+    }).then((response) => response.json());
+
+    const error = TwitterError.fromJson(json);
+    if (error) {
+      throw error;
+    }
+
+    return json;
   }
 
   async post(endpoint, body, parameters) {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
-    return cleanResponse(
-      await fetch(url.toString(), {
-        headers: {
-          Authorization: await this.credentials.authorizationHeader(url),
-        },
-        body: JSON.stringify(body || {}),
-      })
-    );
+    const json = await fetch(url.toString(), {
+      headers: {
+        Authorization: await this.credentials.authorizationHeader(url),
+      },
+      body: JSON.stringify(body || {}),
+    }).then((response) => response.json());
+
+    const error = TwitterError.fromJson(json);
+    if (error) {
+      throw error;
+    }
+
+    return json;
   }
 
   stream(endpoint, parameters) {

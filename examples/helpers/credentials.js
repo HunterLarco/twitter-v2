@@ -1,4 +1,4 @@
-const enquirer = require('enquirer')
+const enquirer = require('enquirer');
 
 async function createFromCLI(args) {
   const credentials = {
@@ -31,4 +31,4 @@ async function createFromCLI(args) {
 
 module.exports = {
   createFromCLI,
-}
+};

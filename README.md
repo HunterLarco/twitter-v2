@@ -11,11 +11,11 @@ const client = new Twitter({
   consumer_key: '',
   consumer_secret: '',
   access_token_key: '',
-  access_token_secret: ''
+  access_token_secret: '',
 });
 
-const { data } = await client.get('tweets', { ids: '1228393702244134912' })
-console.log(data)
+const { data } = await client.get('tweets', { ids: '1228393702244134912' });
+console.log(data);
 ```
 
 ## Installation
@@ -24,7 +24,7 @@ console.log(data)
 
 ## Quick Start
 
-You will need valid Twitter developer credentials in the form of a set of consumer and access tokens/keys. You can get early access V2 keys [here](https://developer.twitter.com/en/apply-for-access). 
+You will need valid Twitter developer credentials in the form of a set of consumer and access tokens/keys. You can get early access V2 keys [here](https://developer.twitter.com/en/apply-for-access).
 
 ## For User based authentication:
 
@@ -33,7 +33,7 @@ const client = new Twitter({
   consumer_key: '',
   consumer_secret: '',
   access_token_key: '',
-  access_token_secret: ''
+  access_token_secret: '',
 });
 ```
 

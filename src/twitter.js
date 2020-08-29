@@ -102,21 +102,21 @@ async function cleanResponse(response) {
     );
   }
 
-  return body
+  return body;
 }
 
 function applyParameters(url, parameters, prefix) {
-  prefix = prefix || ''
+  prefix = prefix || '';
 
   if (!parameters) {
-    return
+    return;
   }
 
   for (const [key, value] of Object.entries(parameters)) {
     if (typeof value == 'object' && value instanceof Array) {
       url.searchParams.set(prefix + key, value.join(','));
     } else if (typeof value == 'object') {
-      applyParameters(url, value, `${prefix}${key}.`)
+      applyParameters(url, value, `${prefix}${key}.`);
     } else {
       url.searchParams.set(prefix + key, value);
     }
@@ -207,7 +207,7 @@ class Twitter {
     await this._createBearerIfNeeded();
 
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-    applyParameters(url, parameters)
+    applyParameters(url, parameters);
 
     return cleanResponse(
       await fetch(url.toString(), {
@@ -222,7 +222,7 @@ class Twitter {
     await this._createBearerIfNeeded();
 
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-    applyParameters(url, parameters)
+    applyParameters(url, parameters);
 
     return cleanResponse(
       await fetch(url.toString(), {
@@ -240,7 +240,7 @@ class Twitter {
     return new TwitterStream(
       async () => {
         const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-        applyParameters(url, parameters)
+        applyParameters(url, parameters);
 
         await this._createBearerIfNeeded();
 

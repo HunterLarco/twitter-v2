@@ -18,14 +18,14 @@ async function main() {
         'referenced_tweets',
         'source',
         'author_id',
-      ]
-    }
-  })
+      ],
+    },
+  });
 
   for (const tweet of tweets) {
-    console.log(tweet)
+    console.log(tweet);
   }
-  console.log(meta)
+  console.log(meta);
 }
 
 if (require.main === module) {

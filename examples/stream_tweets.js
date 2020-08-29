@@ -4,6 +4,8 @@ const credentials = require('./helpers/credentials.js');
 
 async function main() {
   const client = new Twitter(await credentials.fromCommandLine());
+
+  // Sampled Stream API Reference: https://bit.ly/31CU870
   const stream = client.stream('tweets/sample/stream');
 
   // Close the stream after 30 seconds

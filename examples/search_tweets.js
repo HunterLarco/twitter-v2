@@ -5,6 +5,7 @@ const credentials = require('./helpers/credentials.js');
 async function main() {
   const client = new Twitter(await credentials.fromCommandLine());
 
+  // Recent Tweet Search API Reference: https://bit.ly/3jqFjKF
   const { data: tweets, meta } = await client.get('tweets/search/recent', {
     query: 'url:"https://medium.com" -is:retweet lang:en',
     max_results: 10,

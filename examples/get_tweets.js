@@ -5,6 +5,7 @@ const credentials = require('./helpers/credentials.js');
 async function main() {
   const client = new Twitter(await credentials.fromCommandLine());
 
+  // Tweet Lookup API Reference: https://bit.ly/2QF58Kw
   const { data: tweet } = await client.get('tweets', {
     ids: '1228393702244134912',
     tweet: {

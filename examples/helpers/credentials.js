@@ -36,7 +36,7 @@ module.exports.fromCommandLine = async () => {
       type: 'input',
       name: 'consumer_secret',
       message: `consumer-secret:`,
-      validate: enquirerNotEmptyValidation
+      validate: enquirerNotEmptyValidation,
     });
   }
 
@@ -63,4 +63,4 @@ module.exports.fromCommandLine = async () => {
 
   const promptResults = await enquirer.prompt(prompts);
   return { ...credentials, ...promptResults };
-}
+};

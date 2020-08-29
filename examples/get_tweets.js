@@ -4,7 +4,20 @@ const credentials = require('./helpers/credentials.js');
 
 async function main() {
   const client = new Twitter(await credentials.fromCommandLine());
-  console.log(await client.get('tweets', { ids: '1228393702244134912' }));
+
+  const { data: tweet } = await client.get('tweets', {
+    ids: '1228393702244134912',
+    tweet: {
+      fields: [
+        'created_at',
+        'entities',
+        'public_metrics',
+        'author_id',
+      ],
+    },
+  });
+
+  console.log(tweet);
 }
 
 if (require.main === module) {

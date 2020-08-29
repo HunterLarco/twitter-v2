@@ -9,12 +9,7 @@ async function main() {
   const { data: tweet } = await client.get('tweets', {
     ids: '1228393702244134912',
     tweet: {
-      fields: [
-        'created_at',
-        'entities',
-        'public_metrics',
-        'author_id',
-      ],
+      fields: ['created_at', 'entities', 'public_metrics', 'author_id'],
     },
   });
 

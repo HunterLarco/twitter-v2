@@ -88,9 +88,11 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
 
 async function cleanResponse(response) {
   const body = await response.json();
+
   if (body.status && body.status != 200) {
     throw new TwitterError(body.title, body.status, body.detail);
   }
+
   if (body.errors) {
     const error = body.errors[0];
     throw new TwitterError(
@@ -100,7 +102,25 @@ async function cleanResponse(response) {
     );
   }
 
-  return body;
+  return body
+}
+
+function applyParameters(url, parameters, prefix) {
+  prefix = prefix || ''
+
+  if (!parameters) {
+    return
+  }
+
+  for (const [key, value] of Object.entries(parameters)) {
+    if (typeof value == 'object' && value instanceof Array) {
+      url.searchParams.set(prefix + key, value.join(','));
+    } else if (typeof value == 'object') {
+      applyParameters(url, value, `${prefix}${key}.`)
+    } else {
+      url.searchParams.set(prefix + key, value);
+    }
+  }
 }
 
 class Twitter {
@@ -187,11 +207,7 @@ class Twitter {
     await this._createBearerIfNeeded();
 
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-    if (parameters) {
-      for (const [key, value] of Object.entries(parameters)) {
-        url.searchParams.set(key, value);
-      }
-    }
+    applyParameters(url, parameters)
 
     return cleanResponse(
       await fetch(url.toString(), {
@@ -206,11 +222,7 @@ class Twitter {
     await this._createBearerIfNeeded();
 
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-    if (parameters) {
-      for (const [key, value] of Object.entries(parameters)) {
-        url.searchParams.set(key, value);
-      }
-    }
+    applyParameters(url, parameters)
 
     return cleanResponse(
       await fetch(url.toString(), {
@@ -228,11 +240,7 @@ class Twitter {
     return new TwitterStream(
       async () => {
         const url = new URL(`https://api.twitter.com/2/${endpoint}`);
-        if (parameters) {
-          for (const [key, value] of Object.entries(parameters)) {
-            url.searchParams.set(key, value);
-          }
-        }
+        applyParameters(url, parameters)
 
         await this._createBearerIfNeeded();
 

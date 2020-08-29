@@ -20,3 +20,6 @@ examples/
 # Ignore prettier
 .prettierignore
 .prettierrc.json
+
+# Ignore Github Configs
+.github/

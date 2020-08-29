@@ -1,6 +1,9 @@
 const enquirer = require('enquirer');
+const minimist = require('minimist');
 
-async function createFromCLI(args) {
+async function fromCommandLine() {
+  const args = minimist(process.argv.slice(2));
+
   const credentials = {
     consumer_key: args['consumer-key'],
     consumer_secret: args['consumer-secret'],
@@ -30,5 +33,5 @@ async function createFromCLI(args) {
 }
 
 module.exports = {
-  createFromCLI,
+  fromCommandLine,
 };

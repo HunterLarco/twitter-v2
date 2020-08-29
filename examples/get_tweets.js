@@ -1,11 +1,9 @@
-const Credentials = require('./helpers/credentials.js');
 const Twitter = require('../src/twitter.js');
 
-async function main() {
-  const args = require('minimist')(process.argv.slice(2));
-  const credentials = await Credentials.createFromCLI(args);
+const credentials = require('./helpers/credentials.js');
 
-  const client = new Twitter(credentials);
+async function main() {
+  const client = new Twitter(await credentials.fromCommandLine());
   console.log(await client.get('tweets', { ids: '1228393702244134912' }));
 }
 

@@ -1,0 +1,22 @@
+# Mac OS
+.DS_Store
+
+# Ignore Node Modules
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Ignore backup files.
+*~
+
+# Ignore Vim swap files.
+.*.swp
+
+# Ignore Examples
+examples/
+
+# Ignore prettier
+.prettierignore
+.prettierrc.json

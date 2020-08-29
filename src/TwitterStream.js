@@ -57,40 +57,9 @@ class TwitterStream {
 
             const json = JSON.parse(line);
 
-            if (json.status && json.status != 200) {
-              this._emit(
-                Promise.reject(
-                  new TwitterError(json.title, json.status, json.detail)
-                )
-              );
-              this.close();
-              return;
-            }
-
-            if (json.type) {
-              this._emit(
-                Promise.reject(
-                  new TwitterError(
-                    `${json.title}: ${json.detail}`,
-                    null,
-                    json.type
-                  )
-                )
-              );
-              this.close();
-              return;
-            }
-
-            if (json.errors) {
-              this._emit(
-                Promise.reject(
-                  new TwitterError(
-                    `${json.title}: ${json.errors[0].message}`,
-                    json.type,
-                    json.detail
-                  )
-                )
-              );
+            const error = TwitterError.fromJson(json);
+            if (error) {
+              this._emit(Promise.reject(error));
               this.close();
               return;
             }

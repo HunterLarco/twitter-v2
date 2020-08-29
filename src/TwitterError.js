@@ -1,4 +1,4 @@
-class TwitterError extends Error {
+module.exports = class TwitterError extends Error {
   constructor(message, code, details) {
     super(message);
 
@@ -18,6 +18,25 @@ class TwitterError extends Error {
       });
     }
   }
-}
+};
 
-module.exports = TwitterError;
+module.exports.fromJson = (json) => {
+  if (json.status && json.status != 200) {
+    return new module.exports(json.title, json.status, json.detail);
+  }
+
+  if (json.type) {
+    return new module.exports(`${json.title}: ${json.detail}`, null, json.type);
+  }
+
+  if (json.errors) {
+    const error = json.errors[0];
+    return new module.exports(
+      `${json.title}: ${error.message}`,
+      json.type,
+      json.detail
+    );
+  }
+
+  return null;
+};

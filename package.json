@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/HunterLarco/twitter-v2#readme",
   "devDependencies": {
+    "chalk": "4.1.0",
     "enquirer": "2.3.6",
     "minimist": "1.2.5",
     "prettier": "2.1.1"

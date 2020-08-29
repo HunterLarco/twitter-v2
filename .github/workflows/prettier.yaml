@@ -21,4 +21,4 @@ jobs:
         uses: creyD/prettier_action@v2.2
         with:
           dry: true
-          prettier_options: --check .
+          prettier_options: --write .

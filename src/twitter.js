@@ -56,7 +56,9 @@ class Twitter {
     applyParameters(url, parameters);
 
     const json = await fetch(url.toString(), {
+      method: 'post',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: await this.credentials.authorizationHeader(url),
       },
       body: JSON.stringify(body || {}),

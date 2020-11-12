@@ -29,10 +29,13 @@ function validate(credentials) {
     );
   }
 
-  if (credentials.access_token && typeof credentials.access_token != 'string') {
+  if (
+    credentials.access_token_key &&
+    typeof credentials.access_token_key != 'string'
+  ) {
     throw new Error(
-      'Invalid value for access_token. Expected string but got ' +
-        typeof credentials.access_token
+      'Invalid value for access_token_key. Expected string but got ' +
+        typeof credentials.access_token_key
     );
   }
 
@@ -54,19 +57,19 @@ function validate(credentials) {
     throw new Error('Missing required argument: consumer_secret');
   }
 
-  if (!!credentials.access_token ^ !!credentials.access_token_secret) {
+  if (!!credentials.access_token_key ^ !!credentials.access_token_secret) {
     throw new Error(
-      'Invalid argument: access_token and access_token_secret must both be ' +
+      'Invalid argument: access_token_key and access_token_secret must both be ' +
         'defined when using user authorization'
     );
   }
 
   if (
-    (credentials.access_token || credentials.access_token_secret) &&
+    (credentials.access_token_key || credentials.access_token_secret) &&
     credentials.bearer_token
   ) {
     throw new Error(
-      'Invalid argument: access_token and access_token_secret should not ' +
+      'Invalid argument: access_token_key and access_token_secret should not ' +
         'be used with bearer_token'
     );
   }
@@ -112,14 +115,14 @@ module.exports = class Credentials {
       consumer_key,
       consumer_secret,
       bearer_token,
-      access_token,
+      access_token_key,
       access_token_secret,
     } = args || {};
 
     this._consumer_key = consumer_key;
     this._consumer_secret = consumer_secret;
     this._bearer_token = bearer_token;
-    this._access_token = access_token;
+    this._access_token_key = access_token_key;
     this._access_token_secret = access_token_secret;
 
     this._bearer_token_promise = null;
@@ -153,8 +156,8 @@ module.exports = class Credentials {
     return this._bearer_token;
   }
 
-  get access_token() {
-    return this._access_token;
+  get access_token_key() {
+    return this._access_token_key;
   }
 
   get access_token_secret() {
@@ -162,7 +165,7 @@ module.exports = class Credentials {
   }
 
   appAuth() {
-    return !this.access_token && !this.access_token_secret;
+    return !this.access_token_key && !this.access_token_secret;
   }
 
   userAuth() {
@@ -211,7 +214,7 @@ module.exports = class Credentials {
           method: 'get',
         },
         {
-          key: this.access_token,
+          key: this.access_token_key,
           secret: this.access_token_secret,
         }
       )

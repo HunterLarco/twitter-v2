@@ -18,7 +18,7 @@ module.exports.fromCommandLine = async () => {
     consumer_key: args['consumer-key'],
     consumer_secret: args['consumer-secret'],
     bearer_token: args['bearer-token'],
-    access_token: args['access-token'],
+    access_token_key: args['access-token-key'],
     access_token_secret: args['access-token-secret'],
   };
 

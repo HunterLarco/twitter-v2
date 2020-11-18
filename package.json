@@ -4,7 +4,12 @@
   "description": "An asynchronous client library for the Twitter REST and Streaming V2 API's.",
   "main": "src/twitter.js",
   "scripts": {
+    "check-code": "prettier . --check",
+    "format-code": "prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pre-commit": {
+    "run": "check-code"
   },
   "repository": {
     "type": "git",
@@ -33,6 +38,7 @@
     "chalk": "4.1.0",
     "enquirer": "2.3.6",
     "minimist": "1.2.5",
+    "pre-commit": "1.2.2",
     "prettier": "2.1.1"
   },
   "dependencies": {

@@ -29,14 +29,5 @@ module.exports.fromJson = (json) => {
     return new module.exports(`${json.title}: ${json.detail}`, null, json.type);
   }
 
-  if (json.errors) {
-    const error = json.errors[0];
-    return new module.exports(
-      `${json.title}: ${error.message}`,
-      json.type,
-      json.detail
-    );
-  }
-
   return null;
 };

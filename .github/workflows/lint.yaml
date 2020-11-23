@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-         lfs: true
+          lfs: true
 
       - name: Mount npm cache
         uses: actions/cache@v1

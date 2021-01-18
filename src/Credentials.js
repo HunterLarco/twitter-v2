@@ -121,7 +121,14 @@ module.exports = class Credentials {
 
     this._consumer_key = consumer_key;
     this._consumer_secret = consumer_secret;
-    this._bearer_token = bearer_token;
+    // Reasonably, some clients provide the authorization header as the bearer
+    // token, in this case we automatically strip the bearer prefix to normalize
+    // the credentials.
+    //
+    // https://github.com/HunterLarco/twitter-v2/issues/32
+    this._bearer_token = bearer_token.startsWith('Bearer ')
+      ? bearer_token.substr(7)
+      : bearer_token;
     this._access_token_key = access_token_key;
     this._access_token_secret = access_token_secret;
 

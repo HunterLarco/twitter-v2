@@ -126,13 +126,13 @@ module.exports = class Credentials {
     // the credentials.
     //
     // https://github.com/HunterLarco/twitter-v2/issues/32
-    
+
     if (bearer_token) {
       this._bearer_token = bearer_token.startsWith('Bearer ')
         ? bearer_token.substr(7)
-        : bearer_token;  
+        : bearer_token;
     }
-    
+
     this._access_token_key = access_token_key;
     this._access_token_secret = access_token_secret;
 

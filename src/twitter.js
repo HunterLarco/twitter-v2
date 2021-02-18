@@ -72,6 +72,25 @@ class Twitter {
     return json;
   }
 
+  async delete(endpoint, parameters) {
+    const url = new URL(`https://api.twitter.com/2/${endpoint}`);
+    applyParameters(url, parameters);
+
+    const json = await fetch(url.toString(), {
+      method: 'delete',
+      headers: {
+        Authorization: await this.credentials.authorizationHeader(url),
+      },
+    }).then((response) => response.json());
+
+    const error = TwitterError.fromJson(json);
+    if (error) {
+      throw error;
+    }
+
+    return json;
+  }
+
   stream(endpoint, parameters) {
     const abortController = new AbortController();
 

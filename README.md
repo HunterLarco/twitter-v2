@@ -61,12 +61,13 @@ const client = new Twitter({
 
 ## REST API
 
-You can make GET and POST requests against the REST API via the convenience
-methods.
+You can make GET, POST, and DELETE requests against the REST API via the
+convenience methods.
 
 ```javascript
 client.get(path, urlParams);
 client.post(path, body, urlParams);
+client.delete(path, urlParams);
 ```
 
 The REST API convenience methods return Promises.

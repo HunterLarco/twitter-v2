@@ -20,6 +20,11 @@ declare module 'twitter-v2' {
       parameters?: RequestParameters
     ): Promise<T>;
 
+    public delete<T extends any>(
+      endpoint: string,
+      parameters?: RequestParameters
+    ): Promise<T>;
+
     public stream<T extends any>(
       endpoint: string,
       parameters?: RequestParameters

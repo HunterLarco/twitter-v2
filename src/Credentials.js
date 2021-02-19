@@ -212,18 +212,15 @@ module.exports = class Credentials {
     return this._bearer_token_promise;
   }
 
-  async authorizationHeader(url) {
+  async authorizationHeader(url, method, body) {
     if (this.appAuth()) {
       await this.createBearerToken();
       return `Bearer ${this.bearer_token}`;
     }
-
+    let data = { url: url.toString(), method: method };
+    if(body != null) data.data = body;
     return this._oauth.toHeader(
-      this._oauth.authorize(
-        {
-          url: url.toString(),
-          method: 'get',
-        },
+      this._oauth.authorize(data,
         {
           key: this.access_token_key,
           secret: this.access_token_secret,

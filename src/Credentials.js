@@ -218,14 +218,12 @@ module.exports = class Credentials {
       return `Bearer ${this.bearer_token}`;
     }
     let data = { url: url.toString(), method: method };
-    if(body != null) data.data = body;
+    if (body != null) data.data = body;
     return this._oauth.toHeader(
-      this._oauth.authorize(data,
-        {
-          key: this.access_token_key,
-          secret: this.access_token_secret,
-        }
-      )
+      this._oauth.authorize(data, {
+        key: this.access_token_key,
+        secret: this.access_token_secret,
+      })
     ).Authorization;
   }
 };

@@ -51,12 +51,21 @@ const client = new Twitter({
 ## For app based authentication:
 
 Alternatively, app authentication (which can only access public data but is
-often suitable for server applications) only needs your app's consumer keys.
+often suitable for server applications) only needs your app's consumer keys
+and/or bearer token.
 
 ```javascript
 const client = new Twitter({
   consumer_key: '',
   consumer_secret: '',
+});
+```
+
+or
+
+```javascript
+const client = new Twitter({
+  bearer_token: '',
 });
 ```
 

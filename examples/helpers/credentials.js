@@ -23,15 +23,17 @@ module.exports.fromCommandLine = async () => {
   };
 
   const prompts = [];
-  if (!credentials.consumer_key) {
+  if (
+    !credentials.consumer_key &&
+    !credentials.consumer_secret &&
+    !credentials.bearer_token
+  ) {
     prompts.push({
       type: 'input',
       name: 'consumer_key',
       message: `consumer-key:`,
       validate: enquirerNotEmptyValidation,
     });
-  }
-  if (!credentials.consumer_secret) {
     prompts.push({
       type: 'input',
       name: 'consumer_secret',
@@ -55,8 +57,8 @@ module.exports.fromCommandLine = async () => {
     );
     console.log(
       chalk.dim(
-        'Note that you can use --consumer-key and --consumer-secret to ' +
-          'preemptively satisfy these prompts'
+        'Note that you can use --consumer-key and --consumer-secret or ' +
+          '--bearer-token to preemptively satisfy these prompts'
       )
     );
   }

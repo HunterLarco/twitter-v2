@@ -46,12 +46,12 @@ jobs:
       # we still want to test everything that doesn't require auth.
       - name: npm test (TWITTER_DISABLE_E2E)
         run: npm test
-        if: github.repository_owner != 'HunterLarco'
+        if: github.repository_owner != 'HunterLarc'
         env:
           TWITTER_DISABLE_E2E: true
 
       - run: npm test
-        if: github.repository_owner == 'HunterLarco'
+        if: github.repository_owner == 'HunterLarc'
         env:
           TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
           TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Partial testing warning
         uses: actions/github-script@0.9.0
-        if: github.repository_owner != 'HunterLarco'
+        if: github.repository_owner != 'HunterLarc'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

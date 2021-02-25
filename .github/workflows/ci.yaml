@@ -46,16 +46,13 @@ jobs:
       # we still want to test everything that doesn't require auth.
       - name: npm test (TWITTER_DISABLE_E2E)
         run: npm test
-        if: ${{ env.TWITTER_BEARER_TOKEN }} == ''
+        if: ${{ github.repository_owner }} != 'hunterlarco'
         env:
           TWITTER_DISABLE_E2E: true
-          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
 
       - name: Partial testing warning
         uses: actions/github-script@0.9.0
-        if: ${{ env.TWITTER_BEARER_TOKEN }} == ''
-        env:
-          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+        if: ${{ github.repository_owner }} != 'hunterlarco'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -65,11 +62,11 @@ jobs:
               repo: context.repo.repo,
               body: '⚠️ *WARNING:* Unable to run e2e tests. ' +
                 'Reviewers, please ensure to manually run ' +
-                '`npm test` without `TWITTER_DISABLE_E2E`.';
+                '`npm test` without `TWITTER_DISABLE_E2E`.',
             })
 
       - run: npm test
-        if: ${{ env.TWITTER_BEARER_TOKEN }} != ''
+        if: ${{ github.repository_owner }} == 'hunterlarco'
         env:
           TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
           TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}

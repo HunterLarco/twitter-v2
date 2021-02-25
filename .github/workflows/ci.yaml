@@ -44,7 +44,8 @@ jobs:
 
       # Forked repositories cannot execute workflows with secrets. In this case
       # we still want to test everything that doesn't require auth.
-      - run: npm test (TWITTER_DISABLE_E2E)
+      - name: npm test (TWITTER_DISABLE_E2E)
+        run: npm test
         if: ${{ env.TWITTER_BEARER_TOKEN }} == ''
         env:
           TWITTER_DISABLE_E2E: true

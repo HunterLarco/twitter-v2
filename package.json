@@ -6,7 +6,7 @@
   "scripts": {
     "check-code": "prettier . --check",
     "format-code": "prettier . --write",
-    "test": "mocha --ui bdd"
+    "test": "mocha --ui bdd --recursive"
   },
   "pre-commit": {
     "run": "check-code"

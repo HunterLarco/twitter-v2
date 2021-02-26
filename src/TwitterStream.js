@@ -42,7 +42,9 @@ class TwitterStream {
           this._state = State.STARTED;
 
           const response = await this._connect();
-          response.body.pipe(split()).on('data', (line) => {
+          const stream = response.body.pipe(split());
+
+          stream.on('data', (line) => {
             if (!line.trim()) {
               return;
             }
@@ -65,6 +67,19 @@ class TwitterStream {
             }
 
             this._emit(Promise.resolve({ done: false, value: json }));
+          });
+
+          stream.on('error', (error) => {
+            if (this._state !== State.CLOSED) {
+              this._emit(Promise.reject(error));
+              this.close();
+            }
+          });
+
+          stream.on('end', (error) => {
+            if (this._state === State.CLOSED) {
+              this.close();
+            }
           });
         }
 

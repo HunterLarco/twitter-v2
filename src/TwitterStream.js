@@ -31,6 +31,14 @@ class TwitterStream {
     this._events.push(new DeferredPromise());
   }
 
+  _closeWithError(error) {
+    if (this._state !== State.CLOSED) {
+      this._state = State.CLOSED;
+      this._emit(Promise.reject(error));
+      this._close();
+    }
+  }
+
   [Symbol.asyncIterator]() {
     if (this._state == State.CLOSED) {
       throw new Error('Stream has already been closed.');
@@ -61,8 +69,7 @@ class TwitterStream {
 
             const error = TwitterError.fromJson(json);
             if (error) {
-              this._emit(Promise.reject(error));
-              this.close();
+              this._closeWithError(error);
               return;
             }
 
@@ -70,16 +77,11 @@ class TwitterStream {
           });
 
           stream.on('error', (error) => {
-            if (this._state !== State.CLOSED) {
-              this._emit(Promise.reject(error));
-              this.close();
-            }
+            this._closeWithError(error);
           });
 
           stream.on('end', (error) => {
-            if (this._state === State.CLOSED) {
-              this.close();
-            }
+            this.close();
           });
         }
 
@@ -94,9 +96,11 @@ class TwitterStream {
   }
 
   close() {
-    this._state = State.CLOSED;
-    this._emit(Promise.resolve({ done: true }));
-    this._close();
+    if (this._state !== State.CLOSED) {
+      this._state = State.CLOSED;
+      this._emit(Promise.resolve({ done: true }));
+      this._close();
+    }
   }
 }
 

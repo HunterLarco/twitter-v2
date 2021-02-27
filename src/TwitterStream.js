@@ -24,6 +24,7 @@ class TwitterStream {
 
     this._state = State.NOT_STARTED;
     this._events = [new DeferredPromise()];
+    this._timeout = null;
   }
 
   _emit(promise) {
@@ -31,9 +32,27 @@ class TwitterStream {
     this._events.push(new DeferredPromise());
   }
 
+  // As per https://developer.twitter.com/en/docs/labs/v1/filtered-stream/faq
+  //
+  // When streaming Tweets, the goal is to stay connected for as long as
+  // possible, recognizing that disconnects may occur. In Labs, the streaming
+  // endpoint does not include a way to recover Tweets that were missed while
+  // disconnected. Instead, the endpoint provides a 20-second keep alive
+  // heartbeat (it will look like a new line character). Use this signal to
+  // detect if you’re being disconnected.
+  _refreshTimeout() {
+    if (this._state !== State.CLOSED) {
+      clearTimeout(this._timeout);
+      this._timeout = setTimeout(() => {
+        this._closeWithError(new TwitterError('Stream unresponsive'));
+      }, 20000);
+    }
+  }
+
   _closeWithError(error) {
     if (this._state !== State.CLOSED) {
       this._state = State.CLOSED;
+      clearTimeout(this._timeout);
       this._emit(Promise.reject(error));
       this._close();
     }
@@ -52,16 +71,17 @@ class TwitterStream {
           const response = await this._connect();
           const stream = response.body.pipe(split());
 
+          this._refreshTimeout();
+
           stream.on('data', (line) => {
+            this._refreshTimeout();
+
             if (!line.trim()) {
               return;
             }
 
             if (line == 'Rate limit exceeded') {
-              this._emit(
-                Promise.reject(new TwitterError('Rate limit exceeded'))
-              );
-              this.close();
+              this._closeWithError(new TwitterError('Rate limit exceeded'));
               return;
             }
 
@@ -98,6 +118,7 @@ class TwitterStream {
   close() {
     if (this._state !== State.CLOSED) {
       this._state = State.CLOSED;
+      clearTimeout(this._timeout);
       this._emit(Promise.resolve({ done: true }));
       this._close();
     }

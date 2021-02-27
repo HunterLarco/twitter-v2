@@ -97,11 +97,50 @@ continue to download content from Twitter in the background.
 ```javascript
 const stream = client.stream(path, urlParams);
 
+// Close the stream after 30s.
+setTimeout(() => {
+  stream.close();
+}, 30000);
+
 for await (const { data } of stream) {
   console.log(data);
 }
+```
 
-stream.close();
+Note that reconnect logic is not handled by this package, you're responsible for
+implementing it based on the needs of your application. The stream will close
+itself in two cases:
+
+1. If the stream becomes disconnected for an unknown reason, a `TwitterError`
+   will be thrown.
+2. If Twitter's backend disconnects the stream healthily, the stream will be
+   closed with no error.
+
+If you wish to continuously listen to a stream, you'll need to handle both of
+these cases. For example:
+
+```js
+async function listenForever(streamFactory, dataConsumer) {
+  try {
+    for await (const { data } of streamFactory()) {
+      dataConsumer(data);
+    }
+    // The stream has been closed by Twitter. It is usually safe to reconnect.
+    console.log('Stream disconnected healthily. Reconnecting.');
+    listenForever(streamFactory, dataConsumer);
+  } catch (error) {
+    // An error occurred so we reconnect to the stream. Note that we should
+    // probably have retry logic here to prevent reconnection after a number of
+    // closely timed failures (may indicate a problem that is not downstream).
+    console.warn('Stream disconnected with error. Retrying.', error);
+    listenForever(streamFactory, dataConsumer);
+  }
+}
+
+listenForever(
+  () => client.stream('tweets/search/stream'),
+  (data) => console.log(data)
+);
 ```
 
 ## V1.1 API Support

@@ -26,7 +26,7 @@ export type CredentialsArgs =
   | ApplicationFullCredentials
   | UserCredentials;
 
-export class Credentials implements ApplicationCredentials, UserCredentials {
+export class Credentials {
   constructor(args: CredentialsArgs);
 
   public consumer_key: string;

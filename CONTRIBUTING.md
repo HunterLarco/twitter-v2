@@ -28,7 +28,7 @@ This is still a small project, so design decisions are still made somewhat
 informally through discussion in pull requests and issues. However, broadly
 speaking there are a few ideas that are consistent.
 
-- `twitter-v2` is a thin client. Unlike some other packages (see
+- twitter-v2 is a thin client. Unlike some other packages (see
   [twitter-api-v2](https://www.npmjs.com/package/twitter-api-v2) for an example)
   we're not trying to abstract Twitter's API layer through an ORM. We aim to
   simplify usage of Twitter's rest endpoints. This is less of a philosophical
@@ -70,26 +70,20 @@ Explain the problem and include additional details to help maintainers reproduce
 the problem:
 
 - **Use a clear and descriptive title** for the issue to identify the problem.
-
 - **Describe the exact steps which reproduce the problem** in as many details as
   possible. For example, start by explaining how you configured your
-  authentication and which version of `twitter-v2` you are using. When listing
+  authentication and which version of twitter-v2 you are using. When listing
   steps, **don't just say what you did, but explain how you did it**. For
   example, if you experienced a stream failure, did you leave it running
   overnight or for five minutes? What does your `.close()` logic look like?
-
 - **Provide specific examples to demonstrate the steps**. Include links to files
   or GitHub projects, or copy/pasteable snippets, which you use in those
   examples. If you're providing snippets in the issue, use
   [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
-
 - **Describe the behavior you observed after following the steps** and point out
   what exactly is the problem with that behavior.
-
 - **Explain which behavior you expected to see instead and why.**
-
 - **If you're reporting that twitter-v2 crashed**, include the stack trace.
-
 - **If the problem wasn't triggered by a specific action**, describe what you
   were doing before the problem happened and any environment-related information
   that might be unusual. Are you running an old version of node? Running in a
@@ -121,17 +115,13 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Hunter
 
 - **Use a clear and descriptive title** for the issue to identify the
   suggestion.
-
 - **Provide a step-by-step description of the suggested enhancement** in as many
   details as possible.
-
 - **Provide specific examples to demonstrate the steps**. Include copy/pasteable
   snippets which you use in those examples, as
   [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
-
 - **Describe the current behavior** and **explain which behavior you expected to
   see instead** and why.
-
 - **Explain why this enhancement would be useful** to most twitter-v2 users.
 
 ### Your First Code Contribution
@@ -141,7 +131,6 @@ Unsure where to begin contributing? You can start by looking through these
 
 - [Google first issues][good-first-issue] - issues which should only require a
   few lines of code, and a test or two.
-
 - [Help wanted issues][help-wanted] - issues which should be a bit more involved
   than `good first issue` issues.
 

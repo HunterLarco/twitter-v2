@@ -129,7 +129,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Hunter
 Unsure where to begin contributing? You can start by looking through these
 `good first issue` and `help wanted` issues:
 
-- [Google first issues][good-first-issue] - issues which should only require a
+- [Good first issues][good-first-issue] - issues which should only require a
   few lines of code, and a test or two.
 - [Help wanted issues][help-wanted] - issues which should be a bit more involved
   than `good first issue` issues.

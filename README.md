@@ -151,19 +151,3 @@ works well with the following V1.1 modules
 [![NPM](https://nodei.co/npm/twitter.png?compact=true)](https://nodei.co/npm/twitter/)
 
 [![NPM](https://nodei.co/npm/twit.png?compact=true)](https://nodei.co/npm/twit/)
-
-## Pull Requests
-
-Contributions are welcome! Please send a pull request or open an issue and I'll
-make sure to provide review. Before sending, please make sure your PR passes
-lint. You can manually check this with
-
-```bash
-npm run check-code
-```
-
-and you can automatically format your code with
-
-```bash
-npm run format-code
-```

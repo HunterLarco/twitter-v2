@@ -9,6 +9,8 @@ about: Create a report to help us improve
       following:
   - Checked that your issue isn't already filed:
     <https://github.com/hunterlarco/twitter-v2/issues>
+  - Checked the bug report guidelines:
+    <https://github.com/HunterLarco/twitter-v2/blob/master/CONTRIBUTING.md#reporting-bugs>
 
 ### Description
 

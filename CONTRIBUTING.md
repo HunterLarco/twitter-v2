@@ -94,7 +94,7 @@ the problem:
 This section guides you through submitting an enhancement suggestion, including
 completely new features and minor improvements to existing functionality.
 Following these guidelines helps maintainers and the community understand your
-suggestion :pencil:.
+suggestion.
 
 Before creating enhancement suggestions, please check
 [this list](#before-submitting-an-enhancement-suggestion) as you might find out

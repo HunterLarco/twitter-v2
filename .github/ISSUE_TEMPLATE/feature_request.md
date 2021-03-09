@@ -3,6 +3,13 @@ name: Feature request
 about: Suggest an idea for this project
 ---
 
+### Prerequisites
+
+- [ ] Put an X between the brackets on this line if you have done all of the
+      following:
+  - Checked the feature request guidelines:
+    <https://github.com/HunterLarco/twitter-v2/blob/master/CONTRIBUTING.md#suggesting-enhancements>
+
 ## Summary
 
 <!-- One paragraph explanation of the feature. -->

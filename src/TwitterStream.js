@@ -1,5 +1,7 @@
+// noinspection JSUnresolvedFunction
 const split = require('split');
 
+// noinspection JSUnresolvedFunction
 const TwitterError = require('./TwitterError.js');
 
 const State = {
@@ -59,20 +61,23 @@ class TwitterStream {
   }
 
   [Symbol.asyncIterator]() {
-    if (this._state == State.CLOSED) {
+    if (this._state === State.CLOSED) {
       throw new Error('Stream has already been closed.');
     }
 
     return {
       next: async () => {
-        if (this._state == State.NOT_STARTED) {
+        if (this._state === State.NOT_STARTED) {
           this._state = State.STARTED;
 
           const response = await this._connect();
+
+          // noinspection JSUnresolvedFunction,JSUnresolvedVariable
           const stream = response.body.pipe(split());
 
           this._refreshTimeout();
 
+          // noinspection JSUnresolvedFunction
           stream.on('data', (line) => {
             this._refreshTimeout();
 
@@ -80,12 +85,10 @@ class TwitterStream {
               return;
             }
 
-            if (line == 'Rate limit exceeded') {
+            if (line === 'Rate limit exceeded') {
               this._closeWithError(new TwitterError('Rate limit exceeded'));
               return;
             }
-
-            console.log('line', line)
 
             try {
               const json = JSON.parse(line);
@@ -101,10 +104,12 @@ class TwitterStream {
             }
           });
 
+          // noinspection JSUnresolvedFunction
           stream.on('error', (error) => {
             this._closeWithError(error);
           });
 
+          // noinspection JSUnresolvedFunction
           stream.on('end', (error) => {
             this.close();
           });

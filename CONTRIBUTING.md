@@ -1,6 +1,6 @@
 # Contributing to twitter-v2
 
-:+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
+:+1: First off, thanks for taking the time to contribute! :+1:
 
 The following is a set of guidelines for contributing to twitter-v2 and its
 packages, which are hosted on [npm](https://www.npmjs.com/package/twitter-v2).
@@ -40,8 +40,8 @@ speaking there are a few ideas that are consistent.
 ### Reporting Bugs
 
 This section guides you through submitting a bug report. Following these
-guidelines helps maintainers and the community understand your report :pencil:
-and reproduce the behavior :computer: :computer:.
+guidelines helps maintainers and the community understand your report and
+reproduce the behavior.
 
 Before creating bug reports, please check
 [this list](#before-submitting-a-bug-report) as you might find out that you

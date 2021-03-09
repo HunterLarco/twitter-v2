@@ -85,15 +85,20 @@ class TwitterStream {
               return;
             }
 
-            const json = JSON.parse(line);
+            console.log('line', line)
 
-            const error = TwitterError.fromJson(json);
-            if (error) {
-              this._closeWithError(error);
-              return;
+            try {
+              const json = JSON.parse(line);
+
+              const error = TwitterError.fromJson(json);
+              if (error) {
+                this._closeWithError(error);
+                return;
+              }
+
+              this._emit(Promise.resolve({ done: false, value: json }));
+            } catch (e) {
             }
-
-            this._emit(Promise.resolve({ done: false, value: json }));
           });
 
           stream.on('error', (error) => {

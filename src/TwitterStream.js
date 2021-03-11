@@ -18,13 +18,14 @@ class DeferredPromise {
 }
 
 class TwitterStream {
-  constructor(connect, close) {
+  constructor(connect, close, wait) {
     this._connect = connect;
     this._close = close;
 
     this._state = State.NOT_STARTED;
     this._events = [new DeferredPromise()];
     this._timeout = null;
+    this._wait = wait || 20000;
   }
 
   _emit(promise) {
@@ -45,7 +46,7 @@ class TwitterStream {
       clearTimeout(this._timeout);
       this._timeout = setTimeout(() => {
         this._closeWithError(new TwitterError('Stream unresponsive'));
-      }, 20000);
+      }, this._wait);
     }
   }
 

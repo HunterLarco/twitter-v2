@@ -91,7 +91,7 @@ class Twitter {
     return json;
   }
 
-  stream(endpoint, parameters, wait) {
+  stream(endpoint, parameters, options) {
     const abortController = new AbortController();
 
     return new TwitterStream(
@@ -109,7 +109,7 @@ class Twitter {
       () => {
         abortController.abort();
       },
-      wait
+      options || {}
     );
   }
 }

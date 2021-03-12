@@ -27,7 +27,8 @@ declare module 'twitter-v2' {
 
     public stream<T extends any>(
       endpoint: string,
-      parameters?: RequestParameters
+      parameters?: RequestParameters,
+      options?: object
     ): TwitterStream<T>;
   }
 }

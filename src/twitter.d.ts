@@ -1,9 +1,15 @@
 import { CredentialsArgs } from './Credentials';
-import { TwitterStream } from './TwitterStream';
+import { StreamOptions, TwitterStream } from './TwitterStream';
 
 declare module 'twitter-v2' {
   export interface RequestParameters {
     [key: string]: string | Array<string> | RequestParameters;
+  }
+
+  export interface StreamOptions {
+    // Number of seconds to wait for data or a heartbeat ping from Twitter before
+    // considering the stream closed (default value is 30 seconds).
+    timeout: number | undefined;
   }
 
   export default class Twitter {
@@ -28,7 +34,7 @@ declare module 'twitter-v2' {
     public stream<T extends any>(
       endpoint: string,
       parameters?: RequestParameters,
-      options?: object
+      options?: StreamOptions
     ): TwitterStream<T>;
   }
 }

@@ -19,7 +19,7 @@ class DeferredPromise {
 
 class TwitterStream {
   constructor(connect, close, options) {
-    const { timeout = 30000 } = options;
+    const { timeout = 30 } = options;
 
     this._connect = connect;
     this._close = close;
@@ -27,7 +27,7 @@ class TwitterStream {
     this._state = State.NOT_STARTED;
     this._events = [new DeferredPromise()];
     this._timeout = null;
-    this._wait = timeout;
+    this._wait = timeout * 1000;
   }
 
   _emit(promise) {

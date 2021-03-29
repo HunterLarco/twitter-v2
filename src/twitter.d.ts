@@ -6,12 +6,6 @@ declare module 'twitter-v2' {
     [key: string]: string | Array<string> | RequestParameters;
   }
 
-  export interface StreamOptions {
-    // Number of seconds to wait for data or a heartbeat ping from Twitter before
-    // considering the stream closed (default value is 30 seconds).
-    timeout: number | undefined;
-  }
-
   export default class Twitter {
     constructor(credentials: CredentialsArgs);
 

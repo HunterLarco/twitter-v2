@@ -33,7 +33,7 @@ class Twitter {
     });
   }
 
-  async get(endpoint, parameters) {
+  async get(endpoint) {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 

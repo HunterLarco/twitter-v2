@@ -7,6 +7,11 @@ const oauth_1_0a_1 = __importDefault(require("oauth-1.0a"));
 const crypto_1 = __importDefault(require("crypto"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const TwitterError_1 = __importDefault(require("./TwitterError"));
+// For our non-typscript users which may pass nullable values in the credentials
+// object, strip these.
+function removeNullAndUndefined(obj) {
+    Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key]);
+}
 function validate(credentials) {
     // Ensure all tokens are strings
     if ('consumer_key' in credentials &&
@@ -94,6 +99,7 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
 }
 class Credentials {
     constructor(args) {
+        removeNullAndUndefined(args);
         validate(args);
         if ('consumer_key' in args) {
             this._consumer_key = args.consumer_key;

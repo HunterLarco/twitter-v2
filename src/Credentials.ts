@@ -33,6 +33,12 @@ export declare type CredentialsArgs =
   | ApplicationFullCredentials
   | UserCredentials;
 
+// For our non-typscript users which may pass nullable values in the credentials
+// object, strip these.
+function removeNullAndUndefined(obj: object) {
+  Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key]);
+}
+
 function validate(credentials: CredentialsArgs) {
   // Ensure all tokens are strings
 
@@ -196,6 +202,7 @@ export default class Credentials {
   private _oauth?: OAuth;
 
   constructor(args: CredentialsArgs) {
+    removeNullAndUndefined(args);
     validate(args);
 
     if ('consumer_key' in args) {

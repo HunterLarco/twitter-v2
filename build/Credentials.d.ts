@@ -10,6 +10,7 @@ declare interface ApplicationBearerCredentials {
 declare interface ApplicationFullCredentials {
     consumer_key: string;
     consumer_secret: string;
+
     bearer_token: string;
 }
 declare interface UserCredentials {

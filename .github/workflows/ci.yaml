@@ -43,12 +43,12 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: technote-space/get-diff-action@v4
-        with:
-          PATTERNS: build/**/*
-      - name: Stale build warning
+      - name: Check for stale build
+        id: stale-build
+        run: git diff HEAD --quiet
+      - name: Comment help for sale build
+        if: failure() && steps.stale-build.outcome != 'success'
         uses: actions/github-script@0.9.0
-        if: env.GIT_DIFF
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -60,8 +60,6 @@ jobs:
                 'ensure that you have included the result of `npm run build` ' +
                 'in your pull request.',
             })
-      - run: exit 1
-        if: env.GIT_DIFF
 
   test:
     needs: [lint, build]

@@ -9,7 +9,6 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const TwitterError_1 = __importDefault(require("./TwitterError"));
 function validate(credentials) {
     // Ensure all tokens are strings
-  //
     if ('consumer_key' in credentials &&
         typeof credentials.consumer_key != 'string') {
         throw new Error('Invalid value for consumer_key. Expected string but got ' +

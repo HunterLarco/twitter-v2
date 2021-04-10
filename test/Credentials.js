@@ -1,6 +1,6 @@
-const { expect } = require('chai');
+import { expect } from 'chai';
 
-const Credentials = require('../src/Credentials.js');
+import Credentials from '../src/Credentials';
 
 describe('Credentials', () => {
   it('should enforce that credentials are defined', () => {

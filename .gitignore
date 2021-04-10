@@ -1,5 +1,6 @@
 # Mac OS
 .DS_Store
+*.icloud
 
 # Ignore Node Modules
 node_modules/

@@ -1,4 +1,4 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 if (process.env.TWITTER_DISABLE_E2E) {
   console.warn(chalk.yellow('e2e tests are disabled'));

@@ -1,6 +1,6 @@
-const { expect } = require('chai');
+import { expect } from 'chai';
 
-const Twitter = require('../../src/twitter.js');
+import Twitter from '../../src/twitter';
 
 if (!process.env.TWITTER_DISABLE_E2E) {
   describe('e2e search', () => {

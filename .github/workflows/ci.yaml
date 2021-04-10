@@ -24,9 +24,45 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: npm ci
-      - run: npm run check-code
+      - run: npm run lint
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Check for stale build
+        id: stale-build
+        run: git diff HEAD --quiet
+      - name: Comment help for sale build
+        if: failure() && steps.stale-build.outcome != 'success'
+        uses: actions/github-script@0.9.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **ERROR:** the CI build does not match the build/ ' +
+                'folder of this pull request. Please ensure that you have ' + 
+                'included the results of `npm run build` in your pull request.',
+            })
 
   test:
+    needs: [lint, build]
     runs-on: ubuntu-latest
     strategy:
       matrix:

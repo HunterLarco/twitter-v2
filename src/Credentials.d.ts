@@ -27,5 +27,11 @@ export class Credentials implements ApplicationCredentials, UserCredentials {
 
   public createBearerToken(): Promise<string>;
 
-  public authorizationHeader(url: string): Promise<string>;
+  public authorizationHeader(
+    url: string,
+    options: {
+      method: string;
+      body?: object;
+    }
+  ): Promise<string>;
 }

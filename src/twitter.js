@@ -109,7 +109,9 @@ class Twitter {
         return fetch(url.toString(), {
           signal: abortController.signal,
           headers: {
-            Authorization: await this.credentials.authorizationHeader(url),
+            Authorization: await this.credentials.authorizationHeader(url, {
+              method: 'GET',
+            }),
           },
         });
       },

@@ -13,3 +13,5 @@ npm-debug.log*
 
 # Ignore Vim swap files.
 .*.swp
+
+.idea/

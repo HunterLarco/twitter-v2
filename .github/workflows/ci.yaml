@@ -26,11 +26,11 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
-  type-check:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [14.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -41,10 +41,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: npm ci
-      - run: npm run type-check
+      - run: npm run build
 
   test:
-    needs: [lint, type-check]
+    needs: [lint, build]
     runs-on: ubuntu-latest
     strategy:
       matrix:

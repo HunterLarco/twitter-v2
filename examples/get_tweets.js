@@ -1,4 +1,4 @@
-const Twitter = require('../src/twitter.js');
+const Twitter = require('../build/twitter.js');
 
 const credentials = require('./helpers/credentials.js');
 

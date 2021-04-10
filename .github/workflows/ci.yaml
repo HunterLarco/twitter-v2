@@ -43,6 +43,26 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: build/**/*
+      - name: Stale build warning
+        uses: actions/github-script@0.9.0
+        if: env.GIT_DIFF
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '**ERROR:** local build and pr build do not match. Please '+
+                'ensure that you have included the result of `npm run build` ' +
+                'in your pull request.',
+            })
+      - run: exit 1
+        if: env.GIT_DIFF
+
   test:
     needs: [lint, build]
     runs-on: ubuntu-latest

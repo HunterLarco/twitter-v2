@@ -5,6 +5,8 @@ const fetch = require('node-fetch');
 const TwitterError = require('./TwitterError.js');
 
 function validate(credentials) {
+  // Ensure all tokens are strings
+
   if (credentials.consumer_key && typeof credentials.consumer_key != 'string') {
     throw new Error(
       'Invalid value for consumer_key. Expected string but got ' +
@@ -49,18 +51,46 @@ function validate(credentials) {
     );
   }
 
-  if (!credentials.consumer_key) {
-    throw new Error('Missing required argument: consumer_key');
+  // Ensure at least some tokens were provided
+
+  if (
+    !credentials.access_token_key &&
+    !credentials.access_token_secret &&
+    !credentials.consumer_key &&
+    !credentials.consumer_secret &&
+    !credentials.bearer_token
+  ) {
+    throw new Error('Invalid argument: no credentials defined');
   }
 
-  if (!credentials.consumer_secret) {
-    throw new Error('Missing required argument: consumer_secret');
+  // Ensure pairwise relationships
+  //
+  // consumer_key + consumer_secret
+  // access_token_key + access_token_secret
+
+  if (!!credentials.consumer_key ^ !!credentials.consumer_secret) {
+    throw new Error(
+      'Invalid argument: when using consumer keys, both consumer_key and ' +
+        'consumer_secret must be defined'
+    );
   }
 
   if (!!credentials.access_token_key ^ !!credentials.access_token_secret) {
     throw new Error(
-      'Invalid argument: access_token_key and access_token_secret must both be ' +
-        'defined when using user authorization'
+      'Invalid argument: access_token_key and access_token_secret must both ' +
+        'be defined when using user authorization'
+    );
+  }
+
+  // Ensure valid user authentication (if applicable)
+
+  if (
+    (credentials.access_token_key || credentials.access_token_secret) &&
+    (!credentials.consumer_key || !credentials.consumer_secret)
+  ) {
+    throw new Error(
+      'Invalid argument: user authentication requires consumer_key and ' +
+        'consumer_secret to be defined'
     );
   }
 
@@ -69,8 +99,8 @@ function validate(credentials) {
     credentials.bearer_token
   ) {
     throw new Error(
-      'Invalid argument: access_token_key and access_token_secret should not ' +
-        'be used with bearer_token'
+      'Invalid argument: access_token_key and access_token_secret cannot be ' +
+        'used with bearer_token'
     );
   }
 }

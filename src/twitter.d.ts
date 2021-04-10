@@ -1,5 +1,5 @@
 import { CredentialsArgs } from './Credentials';
-import { TwitterStream } from './TwitterStream';
+import { StreamOptions, TwitterStream } from './TwitterStream';
 
 declare module 'twitter-v2' {
   export interface RequestParameters {
@@ -27,7 +27,8 @@ declare module 'twitter-v2' {
 
     public stream<T extends any>(
       endpoint: string,
-      parameters?: RequestParameters
+      parameters?: RequestParameters,
+      options?: StreamOptions
     ): TwitterStream<T>;
   }
 }

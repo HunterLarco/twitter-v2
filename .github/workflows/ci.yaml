@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm ci
+      - run: npm run check-code
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm ci
+
+      # Forked repositories cannot execute workflows with secrets. In this case
+      # we still want to test everything that doesn't require auth.
+      - name: npm test (TWITTER_DISABLE_E2E)
+        run: npm test
+        if: github.repository_owner != 'HunterLarco'
+        env:
+          TWITTER_DISABLE_E2E: true
+
+      - run: npm test
+        if: github.repository_owner == 'HunterLarco'
+        env:
+          TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+          TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+
+  danger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Partial testing warning
+        uses: actions/github-script@0.9.0
+        if: github.repository_owner != 'HunterLarco'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **WARNING:** Unable to run e2e tests. ' +
+                'Reviewers, please ensure to manually run ' +
+                '`npm test` without `TWITTER_DISABLE_E2E`.',
+            })

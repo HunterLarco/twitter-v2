@@ -1,7 +1,16 @@
-export interface ApplicationCredentials {
+export interface ApplicationConsumerCredentials {
   consumer_key: string;
   consumer_secret: string;
-  bearer_token?: string;
+}
+
+export interface ApplicationBearerCredentials {
+  bearer_token: string;
+}
+
+export interface ApplicationFullCredentials {
+  consumer_key: string;
+  consumer_secret: string;
+  bearer_token: string;
 }
 
 export interface UserCredentials {
@@ -11,9 +20,13 @@ export interface UserCredentials {
   access_token_secret: string;
 }
 
-export type CredentialsArgs = ApplicationCredentials | UserCredentials;
+export type CredentialsArgs =
+  | ApplicationConsumerCredentials
+  | ApplicationBearerCredentials
+  | ApplicationFullCredentials
+  | UserCredentials;
 
-export class Credentials implements ApplicationCredentials, UserCredentials {
+export class Credentials {
   constructor(args: CredentialsArgs);
 
   public consumer_key: string;

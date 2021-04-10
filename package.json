@@ -1,12 +1,12 @@
 {
   "name": "twitter-v2",
-  "version": "1.0.3",
+  "version": "1.0.8",
   "description": "An asynchronous client library for the Twitter REST and Streaming V2 API's.",
   "main": "src/twitter.js",
   "scripts": {
     "check-code": "prettier . --check",
     "format-code": "prettier . --write",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --ui bdd --recursive"
   },
   "pre-commit": {
     "run": "check-code"
@@ -36,15 +36,16 @@
   },
   "homepage": "https://github.com/HunterLarco/twitter-v2#readme",
   "devDependencies": {
+    "chai": "4.3.0",
     "chalk": "4.1.0",
     "enquirer": "2.3.6",
     "minimist": "1.2.5",
+    "mocha": "8.3.0",
     "pre-commit": "1.2.2",
     "prettier": "2.1.1"
   },
   "dependencies": {
     "abort-controller": "3.0.0",
-    "crypto": "1.0.1",
     "node-fetch": "2.6.1",
     "oauth-1.0a": "2.2.6",
     "split": "1.0.1"

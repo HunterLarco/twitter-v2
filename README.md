@@ -1,6 +1,7 @@
 # Twitter V2 API for Node.js
 
 [![v2](https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fv2)](https://developer.twitter.com/en/docs/twitter-api)
+![](https://github.com/hunterlarco/twitter-v2/workflows/ci/badge.svg?branch=master)
 
 An asynchronous client library for the Twitter REST and Streaming
 [V2 API's](https://developer.twitter.com/en/docs/twitter-api/early-access).
@@ -50,12 +51,21 @@ const client = new Twitter({
 ## For app based authentication:
 
 Alternatively, app authentication (which can only access public data but is
-often suitable for server applications) only needs your app's consumer keys.
+often suitable for server applications) only needs your app's consumer keys
+and/or bearer token.
 
 ```javascript
 const client = new Twitter({
   consumer_key: '',
   consumer_secret: '',
+});
+```
+
+or
+
+```javascript
+const client = new Twitter({
+  bearer_token: '',
 });
 ```
 
@@ -87,11 +97,50 @@ continue to download content from Twitter in the background.
 ```javascript
 const stream = client.stream(path, urlParams);
 
+// Close the stream after 30s.
+setTimeout(() => {
+  stream.close();
+}, 30000);
+
 for await (const { data } of stream) {
   console.log(data);
 }
+```
 
-stream.close();
+Note that reconnect logic is not handled by this package, you're responsible for
+implementing it based on the needs of your application. The stream will close
+itself in two cases:
+
+1. If the stream becomes disconnected for an unknown reason, a `TwitterError`
+   will be thrown.
+2. If Twitter's backend disconnects the stream healthily, the stream will be
+   closed with no error.
+
+If you wish to continuously listen to a stream, you'll need to handle both of
+these cases. For example:
+
+```js
+async function listenForever(streamFactory, dataConsumer) {
+  try {
+    for await (const { data } of streamFactory()) {
+      dataConsumer(data);
+    }
+    // The stream has been closed by Twitter. It is usually safe to reconnect.
+    console.log('Stream disconnected healthily. Reconnecting.');
+    listenForever(streamFactory, dataConsumer);
+  } catch (error) {
+    // An error occurred so we reconnect to the stream. Note that we should
+    // probably have retry logic here to prevent reconnection after a number of
+    // closely timed failures (may indicate a problem that is not downstream).
+    console.warn('Stream disconnected with error. Retrying.', error);
+    listenForever(streamFactory, dataConsumer);
+  }
+}
+
+listenForever(
+  () => client.stream('tweets/search/stream'),
+  (data) => console.log(data)
+);
 ```
 
 ## V1.1 API Support
@@ -102,19 +151,3 @@ works well with the following V1.1 modules
 [![NPM](https://nodei.co/npm/twitter.png?compact=true)](https://nodei.co/npm/twitter/)
 
 [![NPM](https://nodei.co/npm/twit.png?compact=true)](https://nodei.co/npm/twit/)
-
-## Pull Requests
-
-Contributions are welcome! Please send a pull request or open an issue and I'll
-make sure to provide review. Before sending, please make sure your PR passes
-lint. You can manually check this with
-
-```bash
-npm run check-code
-```
-
-and you can automatically format your code with
-
-```bash
-npm run format-code
-```

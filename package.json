@@ -1,6 +1,6 @@
 {
   "name": "twitter-v2",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "An asynchronous client library for the Twitter REST and Streaming V2 API's.",
   "main": "build/twitter.js",
   "types": "build/twitter.d.ts",

@@ -39,7 +39,9 @@ class Twitter {
 
     const json = await fetch(url.toString(), {
       headers: {
-        Authorization: await this.credentials.authorizationHeader(url),
+        Authorization: await this.credentials.authorizationHeader(url, {
+          method: 'GET',
+        }),
       },
     }).then((response) => response.json());
 
@@ -59,7 +61,10 @@ class Twitter {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: await this.credentials.authorizationHeader(url),
+        Authorization: await this.credentials.authorizationHeader(url, {
+          method: 'POST',
+          body: body,
+        }),
       },
       body: JSON.stringify(body || {}),
     }).then((response) => response.json());
@@ -79,7 +84,9 @@ class Twitter {
     const json = await fetch(url.toString(), {
       method: 'delete',
       headers: {
-        Authorization: await this.credentials.authorizationHeader(url),
+        Authorization: await this.credentials.authorizationHeader(url, {
+          method: 'DELETE',
+        }),
       },
     }).then((response) => response.json());
 
@@ -102,7 +109,9 @@ class Twitter {
         return fetch(url.toString(), {
           signal: abortController.signal,
           headers: {
-            Authorization: await this.credentials.authorizationHeader(url),
+            Authorization: await this.credentials.authorizationHeader(url, {
+              method: 'GET',
+            }),
           },
         });
       },

@@ -2,13 +2,13 @@
   "name": "twitter-v2",
   "version": "1.0.8",
   "description": "An asynchronous client library for the Twitter REST and Streaming V2 API's.",
-  "main": "src/twitter.js",
-  "types": "src/twitter.d.ts",
+  "main": "build/twitter.js",
+  "types": "build/twitter.d.ts",
   "scripts": {
+    "build": "tsc --project .",
     "lint": "prettier . --check",
     "lint:fix": "prettier . --write",
-    "test": "mocha --ui bdd --recursive",
-    "type-check": "tsc --project ."
+    "test": "ts-mocha --ui bdd --recursive"
   },
   "pre-commit": {
     "run": "lint"
@@ -39,6 +39,8 @@
   "homepage": "https://github.com/HunterLarco/twitter-v2#readme",
   "devDependencies": {
     "@tsconfig/node10": "1.0.7",
+    "@types/expect": "24.3.0",
+    "@types/mocha": "8.2.2",
     "@types/node": "14.14.37",
     "chai": "4.3.0",
     "chalk": "4.1.0",
@@ -47,6 +49,7 @@
     "mocha": "8.3.0",
     "pre-commit": "1.2.2",
     "prettier": "2.1.1",
+    "ts-mocha": "8.0.0",
     "typescript": "4.2.4"
   },
   "dependencies": {

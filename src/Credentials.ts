@@ -1,13 +1,45 @@
-const OAuth = require('oauth-1.0a');
-const crypto = require('crypto');
-const fetch = require('node-fetch');
+import OAuth from 'oauth-1.0a';
+import crypto from 'crypto';
+import fetch from 'node-fetch';
+import { URL } from 'url';
 
-const TwitterError = require('./TwitterError.js');
+import TwitterError from './TwitterError';
 
-function validate(credentials) {
+declare interface ApplicationConsumerCredentials {
+  consumer_key: string;
+  consumer_secret: string;
+}
+
+declare interface ApplicationBearerCredentials {
+  bearer_token: string;
+}
+
+declare interface ApplicationFullCredentials {
+  consumer_key: string;
+  consumer_secret: string;
+  bearer_token: string;
+}
+
+declare interface UserCredentials {
+  consumer_key: string;
+  consumer_secret: string;
+  access_token_key: string;
+  access_token_secret: string;
+}
+
+export declare type CredentialsArgs =
+  | ApplicationConsumerCredentials
+  | ApplicationBearerCredentials
+  | ApplicationFullCredentials
+  | UserCredentials;
+
+function validate(credentials: CredentialsArgs) {
   // Ensure all tokens are strings
 
-  if (credentials.consumer_key && typeof credentials.consumer_key != 'string') {
+  if (
+    'consumer_key' in credentials &&
+    typeof credentials.consumer_key != 'string'
+  ) {
     throw new Error(
       'Invalid value for consumer_key. Expected string but got ' +
         typeof credentials.consumer_key
@@ -15,7 +47,7 @@ function validate(credentials) {
   }
 
   if (
-    credentials.consumer_secret &&
+    'consumer_secret' in credentials &&
     typeof credentials.consumer_secret != 'string'
   ) {
     throw new Error(
@@ -24,7 +56,10 @@ function validate(credentials) {
     );
   }
 
-  if (credentials.bearer_token && typeof credentials.bearer_token != 'string') {
+  if (
+    'bearer_token' in credentials &&
+    typeof credentials.bearer_token != 'string'
+  ) {
     throw new Error(
       'Invalid value for bearer_token. Expected string but got ' +
         typeof credentials.bearer_token
@@ -32,7 +67,7 @@ function validate(credentials) {
   }
 
   if (
-    credentials.access_token_key &&
+    'access_token_key' in credentials &&
     typeof credentials.access_token_key != 'string'
   ) {
     throw new Error(
@@ -42,7 +77,7 @@ function validate(credentials) {
   }
 
   if (
-    credentials.access_token_secret &&
+    'access_token_secret' in credentials &&
     typeof credentials.access_token_secret != 'string'
   ) {
     throw new Error(
@@ -54,11 +89,11 @@ function validate(credentials) {
   // Ensure at least some tokens were provided
 
   if (
-    !credentials.access_token_key &&
-    !credentials.access_token_secret &&
-    !credentials.consumer_key &&
-    !credentials.consumer_secret &&
-    !credentials.bearer_token
+    !('access_token_key' in credentials) &&
+    !('access_token_secret' in credentials) &&
+    !('consumer_key' in credentials) &&
+    !('consumer_secret' in credentials) &&
+    !('bearer_token' in credentials)
   ) {
     throw new Error('Invalid argument: no credentials defined');
   }
@@ -68,14 +103,22 @@ function validate(credentials) {
   // consumer_key + consumer_secret
   // access_token_key + access_token_secret
 
-  if (!!credentials.consumer_key ^ !!credentials.consumer_secret) {
+  if (
+    ('consumer_key' in credentials && !('consumer_secret' in credentials)) ||
+    (!('consumer_key' in credentials) && 'consumer_secret' in credentials)
+  ) {
     throw new Error(
       'Invalid argument: when using consumer keys, both consumer_key and ' +
         'consumer_secret must be defined'
     );
   }
 
-  if (!!credentials.access_token_key ^ !!credentials.access_token_secret) {
+  if (
+    ('access_token_key' in credentials &&
+      !('access_token_secret' in credentials)) ||
+    (!('access_token_key' in credentials) &&
+      'access_token_secret' in credentials)
+  ) {
     throw new Error(
       'Invalid argument: access_token_key and access_token_secret must both ' +
         'be defined when using user authorization'
@@ -85,8 +128,9 @@ function validate(credentials) {
   // Ensure valid user authentication (if applicable)
 
   if (
-    (credentials.access_token_key || credentials.access_token_secret) &&
-    (!credentials.consumer_key || !credentials.consumer_secret)
+    ('access_token_key' in credentials ||
+      'access_token_secret' in credentials) &&
+    (!('consumer_key' in credentials) || !('consumer_secret' in credentials))
   ) {
     throw new Error(
       'Invalid argument: user authentication requires consumer_key and ' +
@@ -95,8 +139,9 @@ function validate(credentials) {
   }
 
   if (
-    (credentials.access_token_key || credentials.access_token_secret) &&
-    credentials.bearer_token
+    ('access_token_key' in credentials ||
+      'access_token_secret' in credentials) &&
+    'bearer_token' in credentials
   ) {
     throw new Error(
       'Invalid argument: access_token_key and access_token_secret cannot be ' +
@@ -139,50 +184,53 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
   return body.access_token;
 }
 
-module.exports = class Credentials {
-  constructor(args) {
-    const {
-      consumer_key,
-      consumer_secret,
-      bearer_token,
-      access_token_key,
-      access_token_secret,
-    } = args || {};
+export default class Credentials {
+  private _consumer_key?: string;
+  private _consumer_secret?: string;
+  private _bearer_token?: string;
+  private _access_token_key?: string;
+  private _access_token_secret?: string;
 
-    this._consumer_key = consumer_key;
-    this._consumer_secret = consumer_secret;
+  private _bearer_token_promise?: Promise<void>;
+
+  private _oauth?: OAuth;
+
+  constructor(args: CredentialsArgs) {
+    validate(args);
+
+    if ('consumer_key' in args) {
+      this._consumer_key = args.consumer_key;
+      this._consumer_secret = args.consumer_secret;
+    }
+
     // Reasonably, some clients provide the authorization header as the bearer
     // token, in this case we automatically strip the bearer prefix to normalize
     // the credentials.
     //
     // https://github.com/HunterLarco/twitter-v2/issues/32
-
-    if (bearer_token) {
-      this._bearer_token = bearer_token.startsWith('Bearer ')
-        ? bearer_token.substr(7)
-        : bearer_token;
+    if ('bearer_token' in args) {
+      this._bearer_token = args.bearer_token.startsWith('Bearer ')
+        ? args.bearer_token.substr(7)
+        : args.bearer_token;
     }
 
-    this._access_token_key = access_token_key;
-    this._access_token_secret = access_token_secret;
-
-    this._bearer_token_promise = null;
-
-    this._oauth = OAuth({
-      consumer: {
-        key: consumer_key,
-        secret: consumer_secret,
-      },
-      signature_method: 'HMAC-SHA1',
-      hash_function(base_string, key) {
-        return crypto
-          .createHmac('sha1', key)
-          .update(base_string)
-          .digest('base64');
-      },
-    });
-
-    validate(this);
+    if ('access_token_key' in args) {
+      this._access_token_key = args.access_token_key;
+      this._access_token_secret = args.access_token_secret;
+      this._oauth = new OAuth({
+        consumer: {
+          key: args.consumer_key,
+          secret: args.consumer_secret,
+        },
+        signature_method: 'HMAC-SHA1',
+        hash_function(base_string, key) {
+          return crypto
+            .createHmac('sha1', key)
+            .update(base_string)
+            .digest('base64');
+        },
+      });
+    }
   }
 
   get consumer_key() {
@@ -205,15 +253,15 @@ module.exports = class Credentials {
     return this._access_token_secret;
   }
 
-  appAuth() {
+  appAuth(): boolean {
     return !this.access_token_key && !this.access_token_secret;
   }
 
-  userAuth() {
+  userAuth(): boolean {
     return !this.appAuth();
   }
 
-  async createBearerToken() {
+  async createBearerToken(): Promise<void> {
     if (this.userAuth()) {
       throw new Error(
         'Refusing to create a bearer token when using user authentication'
@@ -236,23 +284,33 @@ module.exports = class Credentials {
         this._bearer_token = token;
       })
       .finally(() => {
-        this._bearer_token_promise = null;
+        this._bearer_token_promise = undefined;
       });
 
     return this._bearer_token_promise;
   }
 
-  async authorizationHeader(url, { method, body }) {
+  async authorizationHeader(
+    url: URL,
+    request: { method: string; body?: object }
+  ): Promise<string> {
     if (this.appAuth()) {
       await this.createBearerToken();
       return `Bearer ${this.bearer_token}`;
     }
+
+    if (!this._oauth) {
+      throw 'OAuth should be defined for user authentication';
+    } else if (!this.access_token_key || !this.access_token_secret) {
+      throw 'Access token should be defined for user authentication';
+    }
+
     return this._oauth.toHeader(
       this._oauth.authorize(
         {
           url: url.toString(),
-          method,
-          data: body || undefined,
+          method: request.method,
+          data: request.body,
         },
         {
           key: this.access_token_key,
@@ -261,4 +319,4 @@ module.exports = class Credentials {
       )
     ).Authorization;
   }
-};
+}

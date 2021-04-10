@@ -1,12 +1,20 @@
-const AbortController = require('abort-controller');
-const fetch = require('node-fetch');
-const split = require('split');
+import AbortController from 'abort-controller';
+import fetch from 'node-fetch';
+import { URL } from 'url';
 
-const Credentials = require('./Credentials.js');
-const TwitterError = require('./TwitterError.js');
-const TwitterStream = require('./TwitterStream.js');
+import Credentials, { CredentialsArgs } from './Credentials';
+import TwitterError from './TwitterError.js';
+import TwitterStream, { StreamOptions } from './TwitterStream';
 
-function applyParameters(url, parameters, prefix) {
+export declare interface RequestParameters {
+  [key: string]: string | Array<string> | RequestParameters;
+}
+
+function applyParameters(
+  url: URL,
+  parameters?: RequestParameters,
+  prefix?: string
+) {
   prefix = prefix || '';
 
   if (!parameters) {
@@ -24,16 +32,17 @@ function applyParameters(url, parameters, prefix) {
   }
 }
 
-class Twitter {
-  constructor(args) {
-    Object.defineProperty(this, 'credentials', {
-      value: new Credentials(args),
-      writable: false,
-      enumerable: true,
-    });
+export default class Twitter {
+  public credentials: Credentials;
+
+  constructor(args: CredentialsArgs) {
+    this.credentials = new Credentials(args);
   }
 
-  async get(endpoint) {
+  async get<T extends any>(
+    endpoint: string,
+    parameters?: RequestParameters
+  ): Promise<T> {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
@@ -53,7 +62,11 @@ class Twitter {
     return json;
   }
 
-  async post(endpoint, body, parameters) {
+  async post<T extends any>(
+    endpoint: string,
+    body: object,
+    parameters?: RequestParameters
+  ): Promise<T> {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
@@ -77,7 +90,10 @@ class Twitter {
     return json;
   }
 
-  async delete(endpoint, parameters) {
+  async delete<T extends any>(
+    endpoint: string,
+    parameters?: RequestParameters
+  ): Promise<T> {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
@@ -98,7 +114,11 @@ class Twitter {
     return json;
   }
 
-  stream(endpoint, parameters, options) {
+  stream<T extends any>(
+    endpoint: string,
+    parameters?: RequestParameters,
+    options?: StreamOptions
+  ): TwitterStream {
     const abortController = new AbortController();
 
     return new TwitterStream(

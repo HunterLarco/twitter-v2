@@ -6,10 +6,12 @@
     "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "checkJs": true,
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "outDir": "build"
   },
 
   "include": ["src/**/*", "tests/**/*"]

@@ -1,24 +1,48 @@
-const split = require('split');
+import split from 'split';
 
-const TwitterError = require('./TwitterError.js');
+import TwitterError from './TwitterError';
 
-const State = {
-  NOT_STARTED: Symbol('NOT_STARTED'),
-  STARTED: Symbol('STARTED'),
-  CLOSED: Symbol('CLOSED'),
-};
+enum State {
+  NOT_STARTED,
+  STARTED,
+  CLOSED,
+}
 
-class DeferredPromise {
+class DeferredPromise<T> {
+  public promise: Promise<T>;
+  public resolve: (value: T | PromiseLike<T>) => void;
+  public reject: (reason?: any) => void;
+
   constructor() {
-    this.promise = new Promise((resolve, reject) => {
+    this.resolve = () => {};
+    this.reject = () => {};
+    this.promise = new Promise<T>((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
   }
 }
 
-class TwitterStream {
-  constructor(connect, close, options) {
+export declare interface StreamOptions {
+  // Number of seconds to wait for data or a heartbeat ping from Twitter before
+  // considering the stream closed (default value is 30 seconds).
+  timeout?: number;
+}
+
+export default class TwitterStream {
+  private _connect: () => Promise<any>;
+  private _close: () => void;
+
+  private _state: State;
+  private _events: Array<DeferredPromise<any>>;
+  private _timeout?: ReturnType<typeof setTimeout>;
+  private _wait: number;
+
+  constructor(
+    connect: () => Promise<any>,
+    close: () => void,
+    options: StreamOptions
+  ) {
     const { timeout = 30 } = options;
 
     this._connect = connect;
@@ -26,7 +50,6 @@ class TwitterStream {
 
     this._state = State.NOT_STARTED;
     this._events = [new DeferredPromise()];
-    this._timeout = null;
     this._wait = timeout * 1000;
   }
 
@@ -45,7 +68,9 @@ class TwitterStream {
   // detect if you’re being disconnected.
   _refreshTimeout() {
     if (this._state !== State.CLOSED) {
-      clearTimeout(this._timeout);
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
       this._timeout = setTimeout(() => {
         this._closeWithError(new TwitterError('Stream unresponsive'));
       }, this._wait);
@@ -55,7 +80,9 @@ class TwitterStream {
   _closeWithError(error) {
     if (this._state !== State.CLOSED) {
       this._state = State.CLOSED;
-      clearTimeout(this._timeout);
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
       this._emit(Promise.reject(error));
       this._close();
     }
@@ -121,11 +148,11 @@ class TwitterStream {
   close() {
     if (this._state !== State.CLOSED) {
       this._state = State.CLOSED;
-      clearTimeout(this._timeout);
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
       this._emit(Promise.resolve({ done: true }));
       this._close();
     }
   }
 }
-
-module.exports = TwitterStream;

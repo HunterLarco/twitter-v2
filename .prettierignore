@@ -1,2 +1,5 @@
 # Ignore Node Modules
 node_modules/
+
+# Compiled code
+build/

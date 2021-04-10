@@ -67,6 +67,10 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
+    env:
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+      TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
 
     steps:
       - uses: actions/checkout@v2
@@ -82,25 +86,23 @@ jobs:
       # we still want to test everything that doesn't require auth.
       - name: npm test (TWITTER_DISABLE_E2E)
         run: npm test
-        if: github.repository_owner != 'HunterLarco'
+        if: ${{ env.TWITTER_CONSUMER_KEY }} == ''
         env:
           TWITTER_DISABLE_E2E: true
 
       - run: npm test
-        if: github.repository_owner == 'HunterLarco'
-        env:
-          TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-          TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
-          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+        if: ${{ env.TWITTER_CONSUMER_KEY }} != ''
 
   danger:
     runs-on: ubuntu-latest
+    env:
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
 
     steps:
       - run: echo ${{ github.ref }}
       - name: Partial testing warning
         uses: actions/github-script@0.9.0
-        if: github.repository_owner != 'HunterLarco'
+        if: ${{ env.TWITTER_CONSUMER_KEY }} == ''
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

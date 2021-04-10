@@ -34,14 +34,6 @@ class TwitterStream {
         this._events[this._events.length - 1].resolve(promise);
         this._events.push(new DeferredPromise());
     }
-    // As per https://developer.twitter.com/en/docs/labs/v1/filtered-stream/faq
-    //
-    // When streaming Tweets, the goal is to stay connected for as long as
-    // possible, recognizing that disconnects may occur. In Labs, the streaming
-    // endpoint does not include a way to recover Tweets that were missed while
-    // disconnected. Instead, the endpoint provides a 20-second keep alive
-    // heartbeat (it will look like a new line character). Use this signal to
-    // detect if you’re being disconnected.
     _refreshTimeout() {
         if (this._state !== State.CLOSED) {
             if (this._timeout) {

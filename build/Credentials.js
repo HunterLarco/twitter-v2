@@ -7,13 +7,10 @@ const oauth_1_0a_1 = __importDefault(require("oauth-1.0a"));
 const crypto_1 = __importDefault(require("crypto"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const TwitterError_1 = __importDefault(require("./TwitterError"));
-// For our non-typscript users which may pass nullable values in the credentials
-// object, strip these.
 function removeNullAndUndefined(obj) {
     Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key]);
 }
 function validate(credentials) {
-    // Ensure all tokens are strings
     if ('consumer_key' in credentials &&
         typeof credentials.consumer_key != 'string') {
         throw new Error('Invalid value for consumer_key. Expected string but got ' +
@@ -39,7 +36,6 @@ function validate(credentials) {
         throw new Error('Invalid value for access_token_secret. Expected string but got ' +
             typeof credentials.access_token_secret);
     }
-    // Ensure at least some tokens were provided
     if (!('access_token_key' in credentials) &&
         !('access_token_secret' in credentials) &&
         !('consumer_key' in credentials) &&
@@ -47,10 +43,6 @@ function validate(credentials) {
         !('bearer_token' in credentials)) {
         throw new Error('Invalid argument: no credentials defined');
     }
-    // Ensure pairwise relationships
-    //
-    // consumer_key + consumer_secret
-    // access_token_key + access_token_secret
     if (('consumer_key' in credentials && !('consumer_secret' in credentials)) ||
         (!('consumer_key' in credentials) && 'consumer_secret' in credentials)) {
         throw new Error('Invalid argument: when using consumer keys, both consumer_key and ' +
@@ -63,7 +55,6 @@ function validate(credentials) {
         throw new Error('Invalid argument: access_token_key and access_token_secret must both ' +
             'be defined when using user authorization');
     }
-    // Ensure valid user authentication (if applicable)
     if (('access_token_key' in credentials ||
         'access_token_secret' in credentials) &&
         (!('consumer_key' in credentials) || !('consumer_secret' in credentials))) {
@@ -105,11 +96,6 @@ class Credentials {
             this._consumer_key = args.consumer_key;
             this._consumer_secret = args.consumer_secret;
         }
-        // Reasonably, some clients provide the authorization header as the bearer
-        // token, in this case we automatically strip the bearer prefix to normalize
-        // the credentials.
-        //
-        // https://github.com/HunterLarco/twitter-v2/issues/32
         if ('bearer_token' in args) {
             this._bearer_token = args.bearer_token.startsWith('Bearer ')
                 ? args.bearer_token.substr(7)

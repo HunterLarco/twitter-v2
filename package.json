@@ -5,13 +5,13 @@
   "main": "src/twitter.js",
   "types": "src/twitter.d.ts",
   "scripts": {
-    "check-code": "prettier . --check",
-    "format-code": "prettier . --write",
-    "lint:ts": "tsc --project .",
-    "test": "mocha --ui bdd --recursive"
+    "lint": "prettier . --check",
+    "lint:fix": "prettier . --write",
+    "test": "mocha --ui bdd --recursive",
+    "type-check": "tsc --project ."
   },
   "pre-commit": {
-    "run": "check-code"
+    "run": "lint"
   },
   "repository": {
     "type": "git",

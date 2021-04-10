@@ -97,6 +97,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - run: echo ${{ github.ref }}
       - name: Partial testing warning
         uses: actions/github-script@0.9.0
         if: github.repository_owner != 'HunterLarco'

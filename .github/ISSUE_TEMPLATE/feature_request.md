@@ -7,8 +7,8 @@ about: Suggest an idea for this project
 
 - [ ] Put an X between the brackets on this line if you have done all of the
       following:
-  - Checked this feature isn't already filed: [open features][open-features]
-  - Checked the [feature request guidelines][feature-request-guidelines]
+  - Checked this feature isn't already filed: [open features]
+  - Checked the [feature request guidelines]
 
 ## Summary
 
@@ -28,5 +28,5 @@ about: Suggest an idea for this project
 
 <!-- Add any other context or code examples about the feature request here. -->
 
-[open-features]: https://github.com/HunterLarco/twitter-v2/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement
-[feature-request-guidelines]: https://github.com/HunterLarco/twitter-v2/blob/master/CONTRIBUTING.md#suggesting-enhancements
+[open features]: https://github.com/HunterLarco/twitter-v2/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement
+[feature request guidelines]: https://github.com/HunterLarco/twitter-v2/blob/master/CONTRIBUTING.md#suggesting-enhancements

@@ -1,4 +1,4 @@
-# twitter-v2 Examples
+# Twitter V2 Examples
 
 These code samples can all be run with `node`
 

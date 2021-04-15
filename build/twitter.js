@@ -39,7 +39,21 @@ class Twitter {
                     method: 'GET',
                 }),
             },
-        }).then((response) => response.json());
+        }).then(async (response) => {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.indexOf('application/json') !== -1) {
+                return {
+                    data: await response.json(),
+                    headers: Object.fromEntries(response.headers.entries()),
+                };
+            }
+            else {
+                return {
+                    text: await response.text(),
+                    header: Object.fromEntries(response.headers.entries()),
+                };
+            }
+        });
         const error = TwitterError_js_1.default.fromJson(json);
         if (error) {
             throw error;

@@ -53,6 +53,7 @@
     "typescript": "4.2.4"
   },
   "dependencies": {
+    "@types/node-fetch": "^2.5.10",
     "abort-controller": "3.0.0",
     "node-fetch": "2.6.1",
     "oauth-1.0a": "2.2.6",

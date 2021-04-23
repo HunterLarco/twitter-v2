@@ -18,8 +18,14 @@ const client = new Twitter({
   access_token_secret: '',
 });
 
-const { data } = await client.get('tweets', { ids: '1228393702244134912' });
-console.log(data);
+async function getTweets(){
+    const { data } = await client.get('tweets', { ids: '1228393702244134912' });
+    return data
+}
+getTweets().then(tweets=>{
+    console.log(tweets);
+});
+
 ```
 
 ## Installation

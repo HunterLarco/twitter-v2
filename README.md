@@ -151,3 +151,50 @@ works well with the following V1.1 modules
 [![NPM](https://nodei.co/npm/twitter.png?compact=true)](https://nodei.co/npm/twitter/)
 
 [![NPM](https://nodei.co/npm/twit.png?compact=true)](https://nodei.co/npm/twit/)
+
+## Events
+
+Client extends event emitter. You can listen on events:
+
+- headers - headers allows check current limit and manage reconnecting logic
+- data - data in stream
+- error - error in stream
+- end - end of stream
+
+Usage:
+
+```
+const s = new Date().getTime();
+const n = () => new Date().getTime() - s;
+
+client.on('headers', (h: object) => {
+    console.log('headers', n(), h)
+})
+client.on('data', (h: object) => {
+    console.log('data', n(), h)
+})
+client.on('error', (h: object) => {
+    console.log('error', n(), h)
+})
+client.on('end', (h: object) => {
+    console.log('end', n(), h)
+})
+```
+
+Especially interesting headers
+
+```
+    'x-rate-limit-limit': [ '50' ],
+    'x-rate-limit-reset': [ '1624480519' ],
+    'x-rate-limit-remaining': [ '48' ],
+```
+
+## Known bugs
+
+This package works only with node 12. In next versions there is a bug connected
+with change in events on streams. Twitter developers works on it, but now you should
+use `twitter filtered stream` only with node 12.
+
+Read more:
+
+> https://github.com/twitterdev/Twitter-API-v2-sample-code/issues/34 > https://twittercommunity.com/t/rate-limit-on-tweets-stream-api/144389/23 > https://github.com/HunterLarco/twitter-v2/issues/66 > https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/master/Filtered-Stream/filtered_stream.js

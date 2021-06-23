@@ -1,8 +1,4 @@
-export = TwitterError;
-declare class TwitterError extends Error {
-    constructor(message: any, code: any, details: any);
+export default class TwitterError extends Error {
+    constructor(message: any, code?: undefined, details?: string | undefined);
+    static fromJson: (json: any) => any;
 }
-declare namespace TwitterError {
-    export { fromJson };
-}
-declare function fromJson(json: any): import("./TwitterError") | null;

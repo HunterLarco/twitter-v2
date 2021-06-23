@@ -191,15 +191,15 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
 }
 
 export default class Credentials {
-  private _consumer_key?: string;
-  private _consumer_secret?: string;
+  private readonly _consumer_key?: string;
+  private readonly _consumer_secret?: string;
   private _bearer_token?: string;
-  private _access_token_key?: string;
-  private _access_token_secret?: string;
+  private readonly _access_token_key?: string;
+  private readonly _access_token_secret?: string;
 
   private _bearer_token_promise?: Promise<void>;
 
-  private _oauth?: OAuth;
+  private readonly _oauth?: OAuth;
 
   constructor(args: CredentialsArgs) {
     removeNullAndUndefined(args);

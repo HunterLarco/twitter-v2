@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const split_1 = __importDefault(require("split"));
 const TwitterError_1 = __importDefault(require("./TwitterError"));
+const events_1 = __importDefault(require("events"));
 var State;
 (function (State) {
     State[State["NOT_STARTED"] = 0] = "NOT_STARTED";
@@ -21,8 +22,9 @@ class DeferredPromise {
         });
     }
 }
-class TwitterStream {
+class TwitterStream extends events_1.default {
     constructor(connect, close, options) {
+        super();
         const { timeout = 30 } = options;
         this._connect = connect;
         this._close = close;
@@ -63,9 +65,11 @@ class TwitterStream {
                 if (this._state == State.NOT_STARTED) {
                     this._state = State.STARTED;
                     const response = await this._connect();
+                    this.emit('headers', response.headers);
                     const stream = response.body.pipe(split_1.default());
                     this._refreshTimeout();
                     stream.on('data', (line) => {
+                        this.emit('data', line);
                         this._refreshTimeout();
                         if (!line.trim()) {
                             return;
@@ -83,9 +87,11 @@ class TwitterStream {
                         this._emit(Promise.resolve({ done: false, value: json }));
                     });
                     stream.on('error', (error) => {
+                        this.emit('error', error);
                         this._closeWithError(error);
                     });
                     stream.on('end', (error) => {
+                        this.emit('end', error);
                         this.close();
                     });
                 }

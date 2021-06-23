@@ -3,8 +3,9 @@ import fetch from 'node-fetch';
 import { URL } from 'url';
 
 import Credentials, { CredentialsArgs } from './Credentials';
-import TwitterError from './TwitterError.js';
+import TwitterError from './TwitterError';
 import TwitterStream, { StreamOptions } from './TwitterStream';
+import EventEmitter from 'events';
 
 export declare interface RequestParameters {
   [key: string]: string | Array<string> | RequestParameters;
@@ -32,11 +33,17 @@ function applyParameters(
   }
 }
 
-export default class Twitter {
+export default class Twitter extends EventEmitter {
   public credentials: Credentials;
 
   constructor(args: CredentialsArgs) {
+    super();
     this.credentials = new Credentials(args);
+    if (!process.version.match(/v12/)) {
+      console.warn(
+        'There is problem with node other than 12. You should downgrade your node because of twitter API have problem with reconnection in later versions.'
+      );
+    }
   }
 
   async get<T extends any>(
@@ -52,7 +59,10 @@ export default class Twitter {
           method: 'GET',
         }),
       },
-    }).then((response) => response.json());
+    }).then((response) => {
+      this.emit('headers', response.headers);
+      return response.json();
+    });
 
     const error = TwitterError.fromJson(json);
     if (error) {
@@ -80,7 +90,10 @@ export default class Twitter {
         }),
       },
       body: JSON.stringify(body || {}),
-    }).then((response) => response.json());
+    }).then((response) => {
+      this.emit('headers', response.headers);
+      return response.json();
+    });
 
     const error = TwitterError.fromJson(json);
     if (error) {
@@ -104,7 +117,10 @@ export default class Twitter {
           method: 'DELETE',
         }),
       },
-    }).then((response) => response.json());
+    }).then((response) => {
+      this.emit('headers', response.headers);
+      return response.json();
+    });
 
     const error = TwitterError.fromJson(json);
     if (error) {
@@ -121,7 +137,7 @@ export default class Twitter {
   ): TwitterStream {
     const abortController = new AbortController();
 
-    return new TwitterStream(
+    const ts = new TwitterStream(
       async () => {
         const url = new URL(`https://api.twitter.com/2/${endpoint}`);
         applyParameters(url, parameters);
@@ -140,6 +156,13 @@ export default class Twitter {
       },
       options || {}
     );
+
+    ts.on('headers', (h) => this.emit('headers', h));
+    ts.on('data', (h) => this.emit('data', h));
+    ts.on('error', (h) => this.emit('error', h));
+    ts.on('end', (h) => this.emit('end', h));
+
+    return ts;
   }
 }
 

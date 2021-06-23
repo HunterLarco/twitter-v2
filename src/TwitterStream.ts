@@ -1,6 +1,7 @@
 import split from 'split';
 
 import TwitterError from './TwitterError';
+import EventEmitter from 'events';
 
 enum State {
   NOT_STARTED,
@@ -29,20 +30,21 @@ export declare interface StreamOptions {
   timeout?: number;
 }
 
-export default class TwitterStream {
-  private _connect: () => Promise<any>;
-  private _close: () => void;
+export default class TwitterStream extends EventEmitter {
+  private readonly _connect: () => Promise<any>;
+  private readonly _close: () => void;
 
   private _state: State;
-  private _events: Array<DeferredPromise<any>>;
+  private readonly _events: Array<DeferredPromise<any>>;
   private _timeout?: ReturnType<typeof setTimeout>;
-  private _wait: number;
+  private readonly _wait: number;
 
   constructor(
     connect: () => Promise<any>,
     close: () => void,
     options: StreamOptions
   ) {
+    super();
     const { timeout = 30 } = options;
 
     this._connect = connect;
@@ -99,11 +101,13 @@ export default class TwitterStream {
           this._state = State.STARTED;
 
           const response = await this._connect();
+          this.emit('headers', response.headers);
           const stream = response.body.pipe(split());
 
           this._refreshTimeout();
 
           stream.on('data', (line) => {
+            this.emit('data', line);
             this._refreshTimeout();
 
             if (!line.trim()) {
@@ -127,10 +131,12 @@ export default class TwitterStream {
           });
 
           stream.on('error', (error) => {
+            this.emit('error', error);
             this._closeWithError(error);
           });
 
           stream.on('end', (error) => {
+            this.emit('end', error);
             this.close();
           });
         }

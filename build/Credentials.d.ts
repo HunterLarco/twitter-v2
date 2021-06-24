@@ -20,13 +20,13 @@ declare interface UserCredentials {
 }
 export declare type CredentialsArgs = ApplicationConsumerCredentials | ApplicationBearerCredentials | ApplicationFullCredentials | UserCredentials;
 export default class Credentials {
-    private _consumer_key?;
-    private _consumer_secret?;
+    private readonly _consumer_key?;
+    private readonly _consumer_secret?;
     private _bearer_token?;
-    private _access_token_key?;
-    private _access_token_secret?;
+    private readonly _access_token_key?;
+    private readonly _access_token_secret?;
     private _bearer_token_promise?;
-    private _oauth?;
+    private readonly _oauth?;
     constructor(args: CredentialsArgs);
     get consumer_key(): string | undefined;
     get consumer_secret(): string | undefined;

@@ -1,6 +1,7 @@
 "use strict";
-module.exports = class TwitterError extends Error {
-    constructor(message, code, details) {
+Object.defineProperty(exports, "__esModule", { value: true });
+class TwitterError extends Error {
+    constructor(message, code = undefined, details = undefined) {
         super(message);
         if (code) {
             Object.defineProperty(this, 'code', {
@@ -17,13 +18,14 @@ module.exports = class TwitterError extends Error {
             });
         }
     }
-};
-module.exports.fromJson = (json) => {
-    if (json.status && json.status != 200) {
-        return new module.exports(json.title, json.status, json.detail);
+}
+exports.default = TwitterError;
+TwitterError.fromJson = (json) => {
+    if (json.status && json.status !== 200) {
+        return new TwitterError(json.title, json.status, json.detail);
     }
     if (json.type) {
-        return new module.exports(`${json.title}: ${json.detail}`, null, json.type);
+        return new TwitterError(`${json.title}: ${json.detail}`, null, json.type);
     }
     return null;
 };

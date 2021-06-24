@@ -7,8 +7,9 @@ const abort_controller_1 = __importDefault(require("abort-controller"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const url_1 = require("url");
 const Credentials_1 = __importDefault(require("./Credentials"));
-const TwitterError_js_1 = __importDefault(require("./TwitterError.js"));
+const TwitterError_1 = __importDefault(require("./TwitterError"));
 const TwitterStream_1 = __importDefault(require("./TwitterStream"));
+const events_1 = __importDefault(require("events"));
 function applyParameters(url, parameters, prefix) {
     prefix = prefix || '';
     if (!parameters) {
@@ -26,9 +27,13 @@ function applyParameters(url, parameters, prefix) {
         }
     }
 }
-class Twitter {
+class Twitter extends events_1.default {
     constructor(args) {
+        super();
         this.credentials = new Credentials_1.default(args);
+        if (!process.version.match(/v12/)) {
+            console.warn('There is problem with node other than 12. You should downgrade your node because of twitter API have problem with reconnection in later versions.');
+        }
     }
     async get(endpoint, parameters) {
         const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
@@ -39,8 +44,11 @@ class Twitter {
                     method: 'GET',
                 }),
             },
-        }).then((response) => response.json());
-        const error = TwitterError_js_1.default.fromJson(json);
+        }).then((response) => {
+            this.emit('headers', response.headers);
+            return response.json();
+        });
+        const error = TwitterError_1.default.fromJson(json);
         if (error) {
             throw error;
         }
@@ -59,8 +67,11 @@ class Twitter {
                 }),
             },
             body: JSON.stringify(body || {}),
-        }).then((response) => response.json());
-        const error = TwitterError_js_1.default.fromJson(json);
+        }).then((response) => {
+            this.emit('headers', response.headers);
+            return response.json();
+        });
+        const error = TwitterError_1.default.fromJson(json);
         if (error) {
             throw error;
         }
@@ -76,8 +87,11 @@ class Twitter {
                     method: 'DELETE',
                 }),
             },
-        }).then((response) => response.json());
-        const error = TwitterError_js_1.default.fromJson(json);
+        }).then((response) => {
+            this.emit('headers', response.headers);
+            return response.json();
+        });
+        const error = TwitterError_1.default.fromJson(json);
         if (error) {
             throw error;
         }
@@ -85,7 +99,7 @@ class Twitter {
     }
     stream(endpoint, parameters, options) {
         const abortController = new abort_controller_1.default();
-        return new TwitterStream_1.default(async () => {
+        const ts = new TwitterStream_1.default(async () => {
             const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
             applyParameters(url, parameters);
             return node_fetch_1.default(url.toString(), {
@@ -99,6 +113,11 @@ class Twitter {
         }, () => {
             abortController.abort();
         }, options || {});
+        ts.on('headers', (h) => this.emit('headers', h));
+        ts.on('data', (h) => this.emit('data', h));
+        ts.on('error', (h) => this.emit('error', h));
+        ts.on('end', (h) => this.emit('end', h));
+        return ts;
     }
 }
 exports.default = Twitter;

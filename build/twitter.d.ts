@@ -1,9 +1,11 @@
+/// <reference types="node" />
 import Credentials, { CredentialsArgs } from './Credentials';
 import TwitterStream, { StreamOptions } from './TwitterStream';
+import EventEmitter from 'events';
 export declare interface RequestParameters {
     [key: string]: string | Array<string> | RequestParameters;
 }
-export default class Twitter {
+export default class Twitter extends EventEmitter {
     credentials: Credentials;
     constructor(args: CredentialsArgs);
     get<T extends any>(endpoint: string, parameters?: RequestParameters): Promise<T>;

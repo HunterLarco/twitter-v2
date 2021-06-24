@@ -12,7 +12,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
     "outDir": "build",
-    "removeComments": true
+    "removeComments": true,
+    "lib": ["es2017"]
   },
 
   "include": ["src/**/*"]

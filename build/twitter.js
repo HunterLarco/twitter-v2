@@ -31,6 +31,9 @@ class Twitter extends events_1.default {
     constructor(args) {
         super();
         this.credentials = new Credentials_1.default(args);
+        if (!process.version.match(/v12/)) {
+            console.warn('There is problem with node other than 12. You should downgrade your node because of twitter API have problem with reconnection in later versions.');
+        }
     }
     async get(endpoint, parameters) {
         const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);

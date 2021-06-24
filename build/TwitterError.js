@@ -22,10 +22,10 @@ class TwitterError extends Error {
 exports.default = TwitterError;
 TwitterError.fromJson = (json) => {
     if (json.status && json.status !== 200) {
-        return new module.exports(json.title, json.status, json.detail);
+        return new TwitterError(json.title, json.status, json.detail);
     }
     if (json.type) {
-        return new module.exports(`${json.title}: ${json.detail}`, null, json.type);
+        return new TwitterError(`${json.title}: ${json.detail}`, null, json.type);
     }
     return null;
 };

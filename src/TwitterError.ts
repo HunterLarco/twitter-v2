@@ -1,7 +1,7 @@
 export default class TwitterError extends Error {
   constructor(
     message,
-    code = undefined,
+    code: null | undefined = undefined,
     details: string | undefined = undefined
   ) {
     super(message);
@@ -25,15 +25,11 @@ export default class TwitterError extends Error {
 
   static fromJson = (json) => {
     if (json.status && json.status !== 200) {
-      return new module.exports(json.title, json.status, json.detail);
+      return new TwitterError(json.title, json.status, json.detail);
     }
 
     if (json.type) {
-      return new module.exports(
-        `${json.title}: ${json.detail}`,
-        null,
-        json.type
-      );
+      return new TwitterError(`${json.title}: ${json.detail}`, null, json.type);
     }
 
     return null;

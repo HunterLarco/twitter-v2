@@ -55,7 +55,6 @@ class Twitter {
                 'Content-Type': 'application/json',
                 Authorization: await this.credentials.authorizationHeader(url, {
                     method: 'POST',
-                    body: body,
                 }),
             },
             body: JSON.stringify(body || {}),

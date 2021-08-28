@@ -102,8 +102,9 @@ setTimeout(() => {
   stream.close();
 }, 30000);
 
-for await (const { data } of stream) {
-  console.log(data);
+for await (const { data, includes } of stream) {
+  console.log("data", data);
+  console.log("includes", includes);
 }
 ```
 
@@ -122,8 +123,8 @@ these cases. For example:
 ```js
 async function listenForever(streamFactory, dataConsumer) {
   try {
-    for await (const { data } of streamFactory()) {
-      dataConsumer(data);
+    for await (const { data, includes } of streamFactory()) {
+      dataConsumer(data, includes);
     }
     // The stream has been closed by Twitter. It is usually safe to reconnect.
     console.log('Stream disconnected healthily. Reconnecting.');
@@ -139,7 +140,10 @@ async function listenForever(streamFactory, dataConsumer) {
 
 listenForever(
   () => client.stream('tweets/search/stream'),
-  (data) => console.log(data)
+  (data, includes) => {
+    console.log("data", data);
+    console.log("includes", includes);
+  }
 );
 ```
 

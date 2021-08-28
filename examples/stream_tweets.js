@@ -14,7 +14,7 @@ async function main() {
   }, 30 * 1000);
 
   // Read data from the stream
-  for await (const { data } of stream) {
+  for await (const { data, includes } of stream) {
     console.log(`${data.id}: ${data.text.replace(/\s/g, ' ')}`);
   }
 

@@ -298,7 +298,7 @@ export default class Credentials {
   }
 
   async authorizationHeader(
-    url: URL,
+    url: string,
     request: { method: string; body?: object }
   ): Promise<string> {
     if (this.appAuth()) {
@@ -315,7 +315,7 @@ export default class Credentials {
     return this._oauth.toHeader(
       this._oauth.authorize(
         {
-          url: url.toString(),
+          url: url,
           method: request.method,
           data: request.body,
         },

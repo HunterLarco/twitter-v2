@@ -174,7 +174,7 @@ class Credentials {
             throw 'Access token should be defined for user authentication';
         }
         return this._oauth.toHeader(this._oauth.authorize({
-            url: url.toString(),
+            url: url,
             method: request.method,
             data: request.body,
         }, {

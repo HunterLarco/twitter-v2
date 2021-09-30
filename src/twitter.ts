@@ -32,6 +32,13 @@ function applyParameters(
   }
 }
 
+function getUrlString(url: URL): string {
+  // make sure spaces query parameters are encoded as %20 and not +
+  // or else oauth signing fails since it uses decodeURIComponent and
+  // encodeURIComponent https://github.com/ddo/oauth-1.0a/issues/111
+  return url.toString().replace(/\+/g, '%20');
+}
+
 export default class Twitter {
   public credentials: Credentials;
 
@@ -46,9 +53,10 @@ export default class Twitter {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
-    const json = await fetch(url.toString(), {
+    const urlString = getUrlString(url);
+    const json = await fetch(urlString, {
       headers: {
-        Authorization: await this.credentials.authorizationHeader(url, {
+        Authorization: await this.credentials.authorizationHeader(urlString, {
           method: 'GET',
         }),
       },
@@ -70,11 +78,12 @@ export default class Twitter {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
-    const json = await fetch(url.toString(), {
+    const urlString = getUrlString(url);
+    const json = await fetch(urlString, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: await this.credentials.authorizationHeader(url, {
+        Authorization: await this.credentials.authorizationHeader(urlString, {
           method: 'POST',
           body: body,
         }),
@@ -97,10 +106,11 @@ export default class Twitter {
     const url = new URL(`https://api.twitter.com/2/${endpoint}`);
     applyParameters(url, parameters);
 
-    const json = await fetch(url.toString(), {
+    const urlString = getUrlString(url);
+    const json = await fetch(urlString, {
       method: 'delete',
       headers: {
-        Authorization: await this.credentials.authorizationHeader(url, {
+        Authorization: await this.credentials.authorizationHeader(urlString, {
           method: 'DELETE',
         }),
       },
@@ -126,12 +136,16 @@ export default class Twitter {
         const url = new URL(`https://api.twitter.com/2/${endpoint}`);
         applyParameters(url, parameters);
 
-        return fetch(url.toString(), {
+        const urlString = getUrlString(url);
+        return fetch(urlString, {
           signal: abortController.signal,
           headers: {
-            Authorization: await this.credentials.authorizationHeader(url, {
-              method: 'GET',
-            }),
+            Authorization: await this.credentials.authorizationHeader(
+              urlString,
+              {
+                method: 'GET',
+              }
+            ),
           },
         });
       },

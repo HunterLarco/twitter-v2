@@ -26,6 +26,9 @@ function applyParameters(url, parameters, prefix) {
         }
     }
 }
+function getUrlString(url) {
+    return url.toString().replace(/\+/g, '%20');
+}
 class Twitter {
     constructor(args) {
         this.credentials = new Credentials_1.default(args);
@@ -33,9 +36,10 @@ class Twitter {
     async get(endpoint, parameters) {
         const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
         applyParameters(url, parameters);
-        const json = await node_fetch_1.default(url.toString(), {
+        const urlString = getUrlString(url);
+        const json = await node_fetch_1.default(urlString, {
             headers: {
-                Authorization: await this.credentials.authorizationHeader(url, {
+                Authorization: await this.credentials.authorizationHeader(urlString, {
                     method: 'GET',
                 }),
             },
@@ -49,11 +53,12 @@ class Twitter {
     async post(endpoint, body, parameters) {
         const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
         applyParameters(url, parameters);
-        const json = await node_fetch_1.default(url.toString(), {
+        const urlString = getUrlString(url);
+        const json = await node_fetch_1.default(urlString, {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: await this.credentials.authorizationHeader(url, {
+                Authorization: await this.credentials.authorizationHeader(urlString, {
                     method: 'POST',
                     body: body,
                 }),
@@ -69,10 +74,11 @@ class Twitter {
     async delete(endpoint, parameters) {
         const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
         applyParameters(url, parameters);
-        const json = await node_fetch_1.default(url.toString(), {
+        const urlString = getUrlString(url);
+        const json = await node_fetch_1.default(urlString, {
             method: 'delete',
             headers: {
-                Authorization: await this.credentials.authorizationHeader(url, {
+                Authorization: await this.credentials.authorizationHeader(urlString, {
                     method: 'DELETE',
                 }),
             },
@@ -88,10 +94,11 @@ class Twitter {
         return new TwitterStream_1.default(async () => {
             const url = new url_1.URL(`https://api.twitter.com/2/${endpoint}`);
             applyParameters(url, parameters);
-            return node_fetch_1.default(url.toString(), {
+            const urlString = getUrlString(url);
+            return node_fetch_1.default(urlString, {
                 signal: abortController.signal,
                 headers: {
-                    Authorization: await this.credentials.authorizationHeader(url, {
+                    Authorization: await this.credentials.authorizationHeader(urlString, {
                         method: 'GET',
                     }),
                 },

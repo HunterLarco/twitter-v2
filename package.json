@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "abort-controller": "3.0.0",
-    "node-fetch": "2.6.1",
+    "node-fetch": "^2.6.7",
     "oauth-1.0a": "2.2.6",
     "split": "1.0.1"
   }
